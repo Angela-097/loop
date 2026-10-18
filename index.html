@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loop - Expresión Digital</title>
   
-  <!-- Fuentes Google Fonts (Se añadieron Newsreader y Space Mono para el toque vintage) -->
+  <!-- Fuentes Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -160,14 +160,14 @@
     </main>
   </div>
 
-  <!-- VISTA 3: PANEL DE CONTROL DE USUARIO / BITÁCORA VINTAGE (DASHBOARD) -->
+  <!-- VISTA 3: PANEL DE CONTROL / BITÁCORA VINTAGE (DASHBOARD) -->
   <div id="dashboardView" class="view-section hidden">
     <main class="journal-container">
       
       <!-- Sidebar Izquierdo -->
       <aside class="journal-sidebar">
         <div class="site-brand">
-          <span id="dashUsernameText">¡Hola, Creador!</span>
+          <span id="dashUsernameText">Creador</span>
           <span>// bitácora personal</span>
         </div>
         
@@ -180,37 +180,56 @@
         </nav>
 
         <div class="sidebar-bio">
-          <p style="margin-bottom: 8px;">"Un rincón digital para archivar ideas, notas de arte, música y proyectos."</p>
+          <p style="margin-bottom: 8px;" id="sidebarBioDisplay">"Un rincón digital para archivar ideas, notas de arte, música y proyectos."</p>
           <button class="submit-btn" id="dashEditBtn" style="width: 100%; margin-top: 10px; font-size: 0.8rem; padding: 8px;">Editar Mi Espacio</button>
         </div>
 
         <div class="dash-section">
-          <h4 style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; color: var(--accent-terracota, #a35d44); margin-bottom: 8px;">Intereses & Etiquetas</h4>
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; text-transform: uppercase; color: var(--golden-batter); margin-bottom: 8px; font-weight: 700;">Intereses & Etiquetas</h4>
           <div class="tags-container" id="dashTagsContainer">
-            <!-- Etiquetas cargadas dinámicamente desde JavaScript -->
+            <!-- Etiquetas cargadas dinámicamente -->
           </div>
         </div>
       </aside>
 
-      <!-- Contenido Derecho -->
+      <!-- Contenido Derecho (Estilo Hoja de Papel con Banner y Columnas) -->
       <section class="journal-content">
         <div>
+          <!-- Cabecera Personalizada -->
           <div class="content-header">
-            <h1 id="seccion-titulo">Blog</h1>
-            <p id="seccion-subtitulo">archivo cronológico // estado: vacío</p>
+            <h1 id="seccion-titulo">¡HOLA!</h1>
+            <p id="seccion-subtitulo">pensamiento del día // bitácora personal</p>
           </div>
 
-          <!-- Contenedor dinámico de publicaciones -->
-          <div id="posts-container">
-            <div class="empty-journal">
-              <p>Aún no hay entradas escritas en este espacio.</p>
-              <span>[ Las publicaciones aparecerán aquí conforme sean creadas ]</span>
+          <!-- Banner de Imagen -->
+          <div class="banner-container" id="bannerDisplay">
+            <img id="bannerImg" src="https://picsum.photos/800/350" alt="Banner del espacio">
+          </div>
+
+          <!-- Secciones Inferiores: Ahora y Actualizaciones -->
+          <div class="journal-sections-grid">
+            
+            <!-- Bloque AHORA -->
+            <div class="journal-box">
+              <h3>Ahora</h3>
+              <p id="nowStatusText">
+                "Explorando nuevas ideas de diseño, escuchando música y construyendo este espacio."
+              </p>
             </div>
+
+            <!-- Bloque ACTUALIZACIONES -->
+            <div class="journal-box">
+              <h3>Actualizaciones</h3>
+              <div id="updatesList">
+                <p style="opacity: 0.7; font-style: italic;">Sin publicaciones recientes.</p>
+              </div>
+            </div>
+
           </div>
         </div>
 
         <div class="journal-footer-note">
-          loop.org // <span id="dashUrlText">tu-sitio.loop.org</span>
+          loop.org // <span id="dashUrlText">usuario.loop.org</span>
         </div>
       </section>
 
@@ -230,7 +249,50 @@
     </ul>
   </footer>
 
-  <!-- Modal personalizado -->
+  <!-- Modal para Editar el Espacio -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-box" style="text-align: left; max-width: 480px;">
+      <h3 style="text-align: center; margin-bottom: 15px;">Personalizar Mi Espacio</h3>
+      <form id="editForm" style="display: flex; flex-direction: column; gap: 12px;">
+        
+        <div class="form-group">
+          <label for="editBannerFile" style="font-size: 0.78rem;">Imagen de Banner (Galería)</label>
+          <div class="input-wrapper" style="background: #fff; padding: 4px;">
+            <input type="file" id="editBannerFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editHeaderTitle" style="font-size: 0.78rem;">Título / Saludo Principal</label>
+          <div class="input-wrapper" style="background: #fff;">
+            <input type="text" id="editHeaderTitle" placeholder="Ej: ¡HOLA!" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editBio" style="font-size: 0.78rem;">Frase Corta (Apartado "Ahora")</label>
+          <div class="input-wrapper" style="background: #fff; padding: 4px;">
+            <textarea id="editBio" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; resize: none; color: var(--cowhide-cocoa);" placeholder="¿Qué estás haciendo ahora?"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editTags" style="font-size: 0.78rem;">Etiquetas (separadas por comas)</label>
+          <div class="input-wrapper" style="background: #fff;">
+            <input type="text" id="editTags" placeholder="arte, musica, peliculas" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" id="cancelEditBtn" class="submit-btn" style="background-color: var(--olive-harvest); flex: 1; margin-top:0;">Cancelar</button>
+          <button type="submit" class="submit-btn" style="flex: 1; margin-top:0;">Guardar Cambios</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal personalizado de mensajes -->
   <div id="customModal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 id="modalTitle">Mensaje</h3>

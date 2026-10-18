@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-  const SUPABASE_URL = 'https://dcdvscthslbszetogkuv.supabase.co'; 
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjZHZzY3Roc2xic3pldG9na3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTU2NDIsImV4cCI6MjEwNzg3MTY0Mn0.vmTxZqdm6_FuD_g8EKAVvbvaKkROMlRPXdcc9O7HYko';        
-  
+  // Configuración de Supabase
+  const SUPABASE_URL = 'https://dcdvscthslbszetogkuv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjZHZzY3Roc2xic3pldG9na3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTU2NDIsImV4cCI6MjEwNzg3MTY0Mn0.vmTxZqdm6_FuD_g8EKAVvbvaKkROMlRPXdcc9O7HYko';
+ 
   let supabase = null;
   if (window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const navGuestLogin = document.getElementById('navGuestLogin');
   const navUserLogout = document.getElementById('navUserLogout');
 
-  // Formulario y Modal
+  // Formulario y Modal de Alertas
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
   const customModal = document.getElementById('customModal');
@@ -39,18 +39,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashTagsContainer = document.getElementById('dashTagsContainer');
   const dashEditBtn = document.getElementById('dashEditBtn');
   
-  // Elementos de las secciones dinámicas de la bitácora
+  // Elementos de las secciones dinámicas
   const seccionTitulo = document.getElementById('seccion-titulo');
   const seccionSubtitulo = document.getElementById('seccion-subtitulo');
   const botonesPill = document.querySelectorAll('.pill-btn');
 
-  let currentUser = null;
+  // Elementos editables del espacio (Banner, Frase Ahora)
+  const editModal = document.getElementById('editModal');
+  const editForm = document.getElementById('editForm');
+  const editBannerFileInput = document.getElementById('editBannerFile');
+  const editHeaderTitleInput = document.getElementById('editHeaderTitle');
+  const editBioInput = document.getElementById('editBio');
+  const editTagsInput = document.getElementById('editTags');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-  // Informaciones para los subtítulos y títulos del menú lateral vintage
+  const bannerImg = document.getElementById('bannerImg');
+  const nowStatusText = document.getElementById('nowStatusText');
+
+  let currentUser = null;
+  let tempBannerBase64 = null;
+
   const seccionesInfo = {
     'blog': {
-      titulo: 'Blog',
-      subtitulo: 'archivo cronológico // estado: vacío'
+      titulo: 'Inicio / Blog',
+      subtitulo: 'archivo cronológico // estado: activo'
     },
     'sobre-mi': {
       titulo: 'Sobre mí',
@@ -70,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Manejo de clic en los botones en forma de píldora de la bitácora
+  // Manejo de pestañas del menú lateral
   botonesPill.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -79,13 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const claveSeccion = btn.getAttribute('data-seccion');
       if (seccionesInfo[claveSeccion] && seccionTitulo && seccionSubtitulo) {
-        seccionTitulo.textContent = seccionesInfo[claveSeccion].titulo;
+        seccionTitulo.textContent = currentUser?.headerTitle || seccionesInfo[claveSeccion].titulo;
         seccionSubtitulo.textContent = seccionesInfo[claveSeccion].subtitulo;
       }
     });
   });
 
-  // FUNCIÓN PRINCIPAL DE CAMBIO DE PANTALLA
   function switchView(viewName) {
     if (loginView) loginView.classList.add('hidden');
     if (signupView) signupView.classList.add('hidden');
@@ -102,35 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Asignar eventos de clic de forma segura
-  if (goToSignupLink) {
-    goToSignupLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView('signup');
-    });
-  }
-
-  if (goToLoginLink) {
-    goToLoginLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView('login');
-    });
-  }
-
-  if (navSignupBtn) {
-    navSignupBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView('signup');
-    });
-  }
-
-  if (navLoginBtn) {
-    navLoginBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView('login');
-    });
-  }
-
+  if (goToSignupLink) goToSignupLink.addEventListener('click', (e) => { e.preventDefault(); switchView('signup'); });
+  if (goToLoginLink) goToLoginLink.addEventListener('click', (e) => { e.preventDefault(); switchView('login'); });
+  if (navSignupBtn) navSignupBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('signup'); });
+  if (navLoginBtn) navLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('login'); });
+  
   if (brandNav) {
     brandNav.addEventListener('click', (e) => {
       e.preventDefault();
@@ -139,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Actualizar la barra superior
   function updateNavState() {
     if (currentUser) {
       if (navGuestLinks) navGuestLinks.classList.add('hidden');
@@ -152,11 +138,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Renderizar datos del usuario actual en el dashboard
   function renderDashboard() {
     if (!currentUser) return;
+    
     if (dashUsernameText) dashUsernameText.textContent = currentUser.username;
     if (dashUrlText) dashUrlText.textContent = `${currentUser.username}.loop.org`;
 
+    // Título de cabecera personalizado
+    if (seccionTitulo) {
+      seccionTitulo.textContent = currentUser.header_title || currentUser.headerTitle || "¡HOLA!";
+    }
+
+    // Frase del apartado "Ahora"
+    if (nowStatusText) {
+      const bioText = currentUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio.";
+      nowStatusText.textContent = `"${bioText}"`;
+    }
+
+    // Imagen del Banner
+    if (bannerImg) {
+      if (currentUser.banner_url || currentUser.bannerUrl) {
+        bannerImg.src = currentUser.banner_url || currentUser.bannerUrl;
+      } else {
+        bannerImg.src = "https://picsum.photos/800/350";
+      }
+    }
+
+    // Etiquetas dinámicas
     if (dashTagsContainer) {
       dashTagsContainer.innerHTML = '';
       if (currentUser.tags && currentUser.tags.length > 0) {
@@ -170,6 +179,82 @@ document.addEventListener('DOMContentLoaded', () => {
         dashTagsContainer.innerHTML = '<span class="tag-chip">#creatividad</span>';
       }
     }
+  }
+
+  // Modal de edición de espacio
+  if (dashEditBtn) {
+    dashEditBtn.addEventListener('click', () => {
+      if (!currentUser) return;
+      if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || currentUser.headerTitle || "¡HOLA!";
+      if (editBioInput) editBioInput.value = currentUser.bio || "";
+      if (editTagsInput) editTagsInput.value = currentUser.tags ? currentUser.tags.join(', ') : '';
+      
+      tempBannerBase64 = null;
+      if (editModal) editModal.classList.remove('hidden');
+    });
+  }
+
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+      if (editModal) editModal.classList.add('hidden');
+    });
+  }
+
+  // Convertir imagen de galería a Base64
+  if (editBannerFileInput) {
+    editBannerFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          tempBannerBase64 = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Guardar cambios de edición
+  if (editForm) {
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nuevoTitulo = editHeaderTitleInput.value.trim() || "¡HOLA!";
+      const nuevaBio = editBioInput.value.trim();
+      const nuevasTagsStr = editTagsInput.value.trim();
+      const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
+
+      const payload = {
+        header_title: nuevoTitulo,
+        bio: nuevaBio,
+        tags: tagsArray
+      };
+
+      if (tempBannerBase64) {
+        payload.banner_url = tempBannerBase64;
+        currentUser.banner_url = tempBannerBase64;
+      }
+
+      currentUser.header_title = nuevoTitulo;
+      currentUser.bio = nuevaBio;
+      currentUser.tags = tagsArray;
+
+      // Actualizar en Supabase
+      if (supabase && currentUser) {
+        const { error } = await supabase
+          .from('espacios')
+          .update(payload)
+          .eq('username', currentUser.username);
+
+        if (error) {
+          showModal('Error', 'No se pudieron guardar los cambios en el servidor.');
+          return;
+        }
+      }
+
+      renderDashboard();
+      if (editModal) editModal.classList.add('hidden');
+      showModal('¡Actualizado!', 'Los cambios de tu espacio se han guardado con éxito.');
+    });
   }
 
   function showModal(title, message, callback) {
@@ -187,8 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function validarUsername(username) {
-    const regex = /^[a-z0-9\-]{3,30}$/;
-    return regex.test(username);
+    return /^[a-z0-9\-]{3,30}$/.test(username);
   }
 
   function validarPassword(password) {
@@ -206,12 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (error) showModal('Error', error.message);
         else showModal('Correo enviado', 'Revisa tu correo para recuperar tu contraseña.');
       }
-    });
-  }
-
-  if (dashEditBtn) {
-    dashEditBtn.addEventListener('click', () => {
-      showModal('Editor de Espacio', 'Próximamente podrás editar tus plantillas desde aquí.');
     });
   }
 
@@ -261,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      currentUser = { username, email, tags: tagsArray };
+      currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '' };
       updateNavState();
       showModal('¡Espacio Creado!', `Felicidades, tu espacio "${username}.loop.org" está activo.`, () => {
         switchView('dashboard');
@@ -279,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (supabase) {
         const { data: perfil, error: perfilError } = await supabase
           .from('espacios')
-          .select('email, username, tags')
+          .select('*')
           .eq('username', usernameInput)
           .single();
 
@@ -298,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        currentUser = { username: perfil.username, email: perfil.email, tags: perfil.tags };
+        currentUser = perfil;
       } else {
         currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'] };
       }
@@ -322,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Verificar sesión persistente
+  // Verificar sesión persistente al cargar
   async function verificarSesionActiva() {
     if (supabase) {
       const { data: { session } } = await supabase.auth.getSession();
