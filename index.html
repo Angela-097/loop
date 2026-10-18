@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loop - Expresión Digital</title>
+  
+  <!-- Fuentes Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-bar">
+    <div class="brand" id="brandNav">
+      <span class="brand-symbol">∞</span>
+      <span class="brand-name">loop</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link-btn" data-target="signup">Espacios</a></li>
+      <li><a href="#">Explorar</a></li>
+      <li><a href="#">Comunidad</a></li>
+      <li id="navGuestLinks"><a href="#" class="nav-link-btn" id="navSignupBtn">Crear cuenta</a></li>
+      <li id="navGuestLogin"><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
+      <li id="navUserLogout" class="hidden"><button id="logoutBtn">Cerrar Sesión</button></li>
+    </ul>
+  </header>
+
+  <!-- VISTA 1: INICIO DE SESIÓN -->
+  <div id="loginView" class="view-section">
+    <section class="hero-banner">
+      <span class="badge">Plataforma Creativa</span>
+      <h1>¡Bienvenido <span class="script-accent">de nuevo!</span></h1>
+    </section>
+
+    <main class="main-container">
+      <div class="login-card">
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label for="loginUsername">Nombre de usuario</label>
+            <div class="input-wrapper">
+              <input type="text" id="loginUsername" placeholder="tu_usuario" required autocomplete="username">
+              <span class="domain-suffix">.loop.org</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Contraseña</label>
+            <div class="input-wrapper">
+              <input type="password" id="loginPassword" placeholder="Tu contraseña" required autocomplete="current-password">
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">Iniciar Sesión</button>
+        </form>
+
+        <hr class="divider">
+
+        <div class="recovery-links">
+          <a href="#" id="goToSignupLink" class="highlight-link">¿Aún no tienes una cuenta? Regístrate aquí.</a>
+          <a href="#" class="recovery-link" id="forgotPassLink">¿Olvidaste tu contraseña?</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- VISTA 2: REGISTRO -->
+  <div id="signupView" class="view-section hidden">
+    <section class="signup-hero">
+      <div class="doodle-bg">
+        <svg class="doodle-svg" viewBox="0 0 800 150" preserveAspectRatio="none">
+          <path d="M50,100 L70,30 L90,100 M110,60 L140,60 L140,110 L110,110 Z M200,40 L230,120 L260,40 M300,90 Q330,20 360,90 M450,50 L490,50 L470,110 Z M550,30 L550,110 M530,70 L570,70 M650,40 L690,110 M720,80 Q750,40 780,80" stroke="rgba(232, 209, 167, 0.35)" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <div class="hero-content-signup">
+        <div class="hero-logo-box">
+          <span class="big-symbol">∞</span>
+          <span class="big-brand">loop</span>
+        </div>
+      </div>
+    </section>
+
+    <main class="signup-container">
+      <div class="signup-grid">
+        <div class="info-column">
+          <h2>Crea tu propio <span class="script-accent-dark">espacio creativo.</span></h2>
+          <p class="subtitle-bold">Creatividad ilimitada, proyectos personales, expresión libre.</p>
+          <p class="description-text">
+            <strong>Loop</strong> es una red social y plataforma de expresión digital para conectar tus ideas, compartir pasatiempos, arte y blogs personales.
+          </p>
+
+          <div class="feature-block">
+            <div class="feature-icon-box">✦</div>
+            <div class="feature-text">
+              <h3>Herramientas poderosas para construir</h3>
+              <p>Crea y personaliza tus páginas con soltura, comparte tus colecciones y organiza tus temas de interés.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="signup-card">
+            <h2 class="card-title">Regístrate <span class="title-sub">gratis</span></h2>
+            <hr class="card-divider">
+
+            <form class="signup-form" id="signupForm">
+              <div class="form-group">
+                <label for="regUsername">Nombre de usuario</label>
+                <div class="input-wrapper">
+                  <input type="text" id="regUsername" placeholder="mi-sitio-creativo" required>
+                  <span class="domain-suffix">.loop.org</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="regTags">Etiquetas (tus intereses, temas de tu espacio)</label>
+                <div class="input-wrapper">
+                  <input type="text" id="regTags" placeholder="arte, musica, blogs, pasatiempos">
+                </div>
+              </div>
+
+              <div class="grid-two-cols">
+                <div class="form-group">
+                  <label for="regPassword">Contraseña</label>
+                  <div class="input-wrapper">
+                    <input type="password" id="regPassword" placeholder="Contraseña" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="regEmail">Correo electrónico</label>
+                  <div class="input-wrapper">
+                    <input type="email" id="regEmail" placeholder="tu@ejemplo.com" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Confirma que eres humano</label>
+                <div class="captcha-box">
+                  <input type="checkbox" id="captchaCheck" required>
+                  <label for="captchaCheck" class="captcha-label">Soy humano</label>
+                  <span class="captcha-badge">Privacidad · Términos</span>
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn register-btn">Crear Mi Espacio</button>
+            </form>
+
+            <div class="already-account">
+              ¿Ya tienes una cuenta? <a href="#" id="goToLoginLink">Inicia sesión aquí.</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- VISTA 3: PANEL DE CONTROL DE USUARIO (DASHBOARD) -->
+  <div id="dashboardView" class="view-section hidden">
+    <main class="dashboard-container">
+      <div class="dashboard-card">
+        <div class="dash-header">
+          <div class="dash-welcome">
+            <h2 id="dashUsernameText">¡Hola, Creador!</h2>
+            <p class="dash-url" id="dashUrlText">tu-sitio.loop.org</p>
+          </div>
+          <button class="submit-btn" id="dashEditBtn">Editar mi Espacio</button>
+        </div>
+
+        <div class="dash-section">
+          <h3>Tus Intereses y Etiquetas</h3>
+          <div class="tags-container" id="dashTagsContainer">
+            <!-- Etiquetas cargadas dinámicamente -->
+          </div>
+        </div>
+
+        <div class="dash-section" style="margin-top: 28px;">
+          <h3>Panel de Administración</h3>
+          <div class="dash-box">
+            <p style="font-weight: 600; margin-bottom: 6px;">Tu sitio está activo y publicado en la red de Loop.</p>
+            <p style="font-size: 0.9rem; color: var(--toasted-caramel);">Puedes agregar nuevas entradas, personalizar tipografías o cambiar la disposición visual.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Pie de Página -->
+  <footer class="footer">
+    <div class="footer-news">
+      Descubre las últimas historias y proyectos en Loop.
+    </div>
+    <ul class="footer-links">
+      <li><a href="#">ACERCA DE</a></li>
+      <li><a href="#">NOVEDADES</a></li>
+      <li><a href="#">TÉRMINOS</a></li>
+      <li><a href="#">CONTACTO</a></li>
+    </ul>
+  </footer>
+
+  <!-- Modal personalizado -->
+  <div id="customModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="modalTitle">Mensaje</h3>
+      <p id="modalMessage">Descripción de la acción.</p>
+      <button id="modalCloseBtn" class="modal-btn">Aceptar</button>
+    </div>
+  </div>
+
+  <!-- Cliente CDN de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Lógica de JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
