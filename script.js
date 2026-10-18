@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Configuración de Supabase (Reemplaza con tus llaves reales)
-  const SUPABASE_URL = 'https://dcdvscthslbszetogkuv.supabase.co'; // Reemplaza con tu URL
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjZHZzY3Roc2xic3pldG9na3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTU2NDIsImV4cCI6MjEwNzg3MTY0Mn0.vmTxZqdm6_FuD_g8EKAVvbvaKkROMlRPXdcc9O7HYko';        // Reemplaza con tu anon key
- 
+
+  const SUPABASE_URL = 'https://dcdvscthslbszetogkuv.supabase.co'; 
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjZHZzY3Roc2xic3pldG9na3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTU2NDIsImV4cCI6MjEwNzg3MTY0Mn0.vmTxZqdm6_FuD_g8EKAVvbvaKkROMlRPXdcc9O7HYko';        
   
   let supabase = null;
   if (window.supabase) {
@@ -34,13 +33,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCloseBtn = document.getElementById('modalCloseBtn');
   const forgotPassLink = document.getElementById('forgotPassLink');
 
-  // Elementos del Dashboard
+  // Elementos del Dashboard / Bitácora
   const dashUsernameText = document.getElementById('dashUsernameText');
   const dashUrlText = document.getElementById('dashUrlText');
   const dashTagsContainer = document.getElementById('dashTagsContainer');
   const dashEditBtn = document.getElementById('dashEditBtn');
+  
+  // Elementos de las secciones dinámicas de la bitácora
+  const seccionTitulo = document.getElementById('seccion-titulo');
+  const seccionSubtitulo = document.getElementById('seccion-subtitulo');
+  const botonesPill = document.querySelectorAll('.pill-btn');
 
   let currentUser = null;
+
+  // Informaciones para los subtítulos y títulos del menú lateral vintage
+  const seccionesInfo = {
+    'blog': {
+      titulo: 'Blog',
+      subtitulo: 'archivo cronológico // estado: vacío'
+    },
+    'sobre-mi': {
+      titulo: 'Sobre mí',
+      subtitulo: 'perfil del autor // notas personales'
+    },
+    'galeria': {
+      titulo: 'Galería',
+      subtitulo: 'colección visual // fotografías y arte'
+    },
+    'visitas': {
+      titulo: 'Libro de Visitas',
+      subtitulo: 'mensajes de la comunidad // firmar'
+    },
+    'enlaces': {
+      titulo: 'Enlaces',
+      subtitulo: 'rincones recomendados de la web'
+    }
+  };
+
+  // Manejo de clic en los botones en forma de píldora de la bitácora
+  botonesPill.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      botonesPill.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const claveSeccion = btn.getAttribute('data-seccion');
+      if (seccionesInfo[claveSeccion] && seccionTitulo && seccionSubtitulo) {
+        seccionTitulo.textContent = seccionesInfo[claveSeccion].titulo;
+        seccionSubtitulo.textContent = seccionesInfo[claveSeccion].subtitulo;
+      }
+    });
+  });
 
   // FUNCIÓN PRINCIPAL DE CAMBIO DE PANTALLA
   function switchView(viewName) {
@@ -111,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderDashboard() {
     if (!currentUser) return;
-    if (dashUsernameText) dashUsernameText.textContent = `¡Hola, ${currentUser.username}!`;
+    if (dashUsernameText) dashUsernameText.textContent = currentUser.username;
     if (dashUrlText) dashUrlText.textContent = `${currentUser.username}.loop.org`;
 
     if (dashTagsContainer) {
@@ -219,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       currentUser = { username, email, tags: tagsArray };
+      updateNavState();
       showModal('¡Espacio Creado!', `Felicidades, tu espacio "${username}.loop.org" está activo.`, () => {
         switchView('dashboard');
       });
@@ -259,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'] };
       }
 
+      updateNavState();
       showModal('¡Bienvenido!', `Accediendo a tu espacio ${currentUser.username}.loop.org...`, () => {
         switchView('dashboard');
       });

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loop - Expresión Digital</title>
   
-  <!-- Fuentes Google Fonts -->
+  <!-- Fuentes Google Fonts (Se añadieron Newsreader y Space Mono para el toque vintage) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -160,33 +160,60 @@
     </main>
   </div>
 
-  <!-- VISTA 3: PANEL DE CONTROL DE USUARIO (DASHBOARD) -->
+  <!-- VISTA 3: PANEL DE CONTROL DE USUARIO / BITÁCORA VINTAGE (DASHBOARD) -->
   <div id="dashboardView" class="view-section hidden">
-    <main class="dashboard-container">
-      <div class="dashboard-card">
-        <div class="dash-header">
-          <div class="dash-welcome">
-            <h2 id="dashUsernameText">¡Hola, Creador!</h2>
-            <p class="dash-url" id="dashUrlText">tu-sitio.loop.org</p>
-          </div>
-          <button class="submit-btn" id="dashEditBtn">Editar mi Espacio</button>
+    <main class="journal-container">
+      
+      <!-- Sidebar Izquierdo -->
+      <aside class="journal-sidebar">
+        <div class="site-brand">
+          <span id="dashUsernameText">¡Hola, Creador!</span>
+          <span>// bitácora personal</span>
+        </div>
+        
+        <nav class="nav-pills">
+          <button class="pill-btn active" data-seccion="blog">Inicio / Blog</button>
+          <button class="pill-btn" data-seccion="sobre-mi">Sobre mí</button>
+          <button class="pill-btn" data-seccion="galeria">Galería</button>
+          <button class="pill-btn" data-seccion="visitas">Libro de visitas</button>
+          <button class="pill-btn" data-seccion="enlaces">Enlaces</button>
+        </nav>
+
+        <div class="sidebar-bio">
+          <p style="margin-bottom: 8px;">"Un rincón digital para archivar ideas, notas de arte, música y proyectos."</p>
+          <button class="submit-btn" id="dashEditBtn" style="width: 100%; margin-top: 10px; font-size: 0.8rem; padding: 8px;">Editar Mi Espacio</button>
         </div>
 
         <div class="dash-section">
-          <h3>Tus Intereses y Etiquetas</h3>
+          <h4 style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; color: var(--accent-terracota, #a35d44); margin-bottom: 8px;">Intereses & Etiquetas</h4>
           <div class="tags-container" id="dashTagsContainer">
-            <!-- Etiquetas cargadas dinámicamente -->
+            <!-- Etiquetas cargadas dinámicamente desde JavaScript -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Contenido Derecho -->
+      <section class="journal-content">
+        <div>
+          <div class="content-header">
+            <h1 id="seccion-titulo">Blog</h1>
+            <p id="seccion-subtitulo">archivo cronológico // estado: vacío</p>
+          </div>
+
+          <!-- Contenedor dinámico de publicaciones -->
+          <div id="posts-container">
+            <div class="empty-journal">
+              <p>Aún no hay entradas escritas en este espacio.</p>
+              <span>[ Las publicaciones aparecerán aquí conforme sean creadas ]</span>
+            </div>
           </div>
         </div>
 
-        <div class="dash-section" style="margin-top: 28px;">
-          <h3>Panel de Administración</h3>
-          <div class="dash-box">
-            <p style="font-weight: 600; margin-bottom: 6px;">Tu sitio está activo y publicado en la red de Loop.</p>
-            <p style="font-size: 0.9rem; color: var(--toasted-caramel);">Puedes agregar nuevas entradas, personalizar tipografías o cambiar la disposición visual.</p>
-          </div>
+        <div class="journal-footer-note">
+          loop.org // <span id="dashUrlText">tu-sitio.loop.org</span>
         </div>
-      </div>
+      </section>
+
     </main>
   </div>
 
