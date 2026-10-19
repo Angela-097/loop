@@ -195,10 +195,31 @@
       <!-- Contenido Derecho (Estilo Hoja de Papel con Banner y Columnas) -->
       <section class="journal-content">
         <div>
-          <!-- Cabecera Personalizada -->
+          <!-- Cabecera Personalizada con Reproductor en la Esquina Superior Derecha -->
           <div class="content-header">
-            <h1 id="seccion-titulo">¡HOLA!</h1>
-            <p id="seccion-subtitulo">pensamiento del día // bitácora personal</p>
+            <div class="header-titles">
+              <h1 id="seccion-titulo">¡HOLA!</h1>
+              <p id="seccion-subtitulo">pensamiento del día // bitácora personal</p>
+            </div>
+
+            <!-- REPRODUCTOR COMPACTO EN LA ESQUINA SUPERIOR -->
+            <div class="spotify-header-card">
+              <div class="spotify-header-note">
+                ♫ Una pequeña playlist para tu visita
+              </div>
+              <div class="spotify-iframe-wrapper">
+                <iframe 
+                  id="spotifyWidgetFrame" 
+                  src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0" 
+                  width="100%" 
+                  height="152" 
+                  frameBorder="0" 
+                  allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy">
+                </iframe>
+              </div>
+            </div>
           </div>
 
           <!-- Banner de Imagen -->
@@ -226,6 +247,7 @@
             </div>
 
           </div>
+
         </div>
 
         <div class="journal-footer-note">
@@ -281,6 +303,15 @@
           <div class="input-wrapper" style="background: #fff;">
             <input type="text" id="editTags" placeholder="arte, musica, peliculas" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
           </div>
+        </div>
+
+        <!-- CAMPO PARA LA PLAYLIST DE SPOTIFY -->
+        <div class="form-group">
+          <label for="editSpotifyUrl" style="font-size: 0.78rem;">Enlace de Playlist de Spotify</label>
+          <div class="input-wrapper" style="background: #fff;">
+            <input type="text" id="editSpotifyUrl" placeholder="https://open.spotify.com/playlist/..." style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
+          </div>
+          <small style="font-size: 0.7rem; color: var(--toasted-caramel); display: block; margin-top: 2px;">Pega el link de Spotify de tu lista para que tus visitas puedan escucharla.</small>
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 10px;">

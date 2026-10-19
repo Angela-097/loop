@@ -44,17 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const seccionSubtitulo = document.getElementById('seccion-subtitulo');
   const botonesPill = document.querySelectorAll('.pill-btn');
 
-  // Elementos editables del espacio (Banner, Frase Ahora)
+  // Elementos editables del espacio (Banner, Frase Ahora, Spotify)
   const editModal = document.getElementById('editModal');
   const editForm = document.getElementById('editForm');
   const editBannerFileInput = document.getElementById('editBannerFile');
   const editHeaderTitleInput = document.getElementById('editHeaderTitle');
   const editBioInput = document.getElementById('editBio');
   const editTagsInput = document.getElementById('editTags');
+  const editSpotifyUrlInput = document.getElementById('editSpotifyUrl');
   const cancelEditBtn = document.getElementById('cancelEditBtn');
 
   const bannerImg = document.getElementById('bannerImg');
   const nowStatusText = document.getElementById('nowStatusText');
+  const spotifyWidgetFrame = document.getElementById('spotifyWidgetFrame');
 
   let currentUser = null;
   let tempBannerBase64 = null;
@@ -138,6 +140,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Función para transformar y actualizar el reproductor de Spotify
+  function actualizarReproductorSpotify(url) {
+    if (!spotifyWidgetFrame) return;
+
+    let embedUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"; // Default
+
+    if (url && url.includes("spotify.com/")) {
+      let cleanUrl = url.split("?")[0];
+      let parts = cleanUrl.split("/");
+      let type = parts[parts.length - 2]; // playlist, album, track
+      let id = parts[parts.length - 1];
+
+      if (id && (type === "playlist" || type === "album" || type === "track")) {
+        embedUrl = `https://open.spotify.com/embed/${type}/${id}?utm_source=generator&theme=0`;
+      }
+    }
+
+    spotifyWidgetFrame.src = embedUrl;
+  }
+
   // Renderizar datos del usuario actual en el dashboard
   function renderDashboard() {
     if (!currentUser) return;
@@ -165,6 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // Actualizar Reproductor de Spotify con la URL del usuario
+    actualizarReproductorSpotify(currentUser.spotify_url);
+
     // Etiquetas dinámicas
     if (dashTagsContainer) {
       dashTagsContainer.innerHTML = '';
@@ -188,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || currentUser.headerTitle || "¡HOLA!";
       if (editBioInput) editBioInput.value = currentUser.bio || "";
       if (editTagsInput) editTagsInput.value = currentUser.tags ? currentUser.tags.join(', ') : '';
+      if (editSpotifyUrlInput) editSpotifyUrlInput.value = currentUser.spotify_url || "";
       
       tempBannerBase64 = null;
       if (editModal) editModal.classList.remove('hidden');
@@ -221,12 +247,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const nuevoTitulo = editHeaderTitleInput.value.trim() || "¡HOLA!";
       const nuevaBio = editBioInput.value.trim();
       const nuevasTagsStr = editTagsInput.value.trim();
+      const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
       const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
 
       const payload = {
         header_title: nuevoTitulo,
         bio: nuevaBio,
-        tags: tagsArray
+        tags: tagsArray,
+        spotify_url: nuevoSpotifyUrl
       };
 
       if (tempBannerBase64) {
@@ -237,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentUser.header_title = nuevoTitulo;
       currentUser.bio = nuevaBio;
       currentUser.tags = tagsArray;
+      currentUser.spotify_url = nuevoSpotifyUrl;
 
       // Actualizar en Supabase
       if (supabase && currentUser) {
@@ -331,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userId = authData.user.id;
         const { error: dbError } = await supabase
           .from('espacios')
-          .insert([{ id: userId, username, email, tags: tagsArray }]);
+          .insert([{ id: userId, username, email, tags: tagsArray, spotify_url: '' }]);
 
         if (dbError) {
           showModal('Error en el servidor', 'El nombre de usuario o correo ya existe.');
@@ -339,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '' };
+      currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '', spotify_url: '' };
       updateNavState();
       showModal('¡Espacio Creado!', `Felicidades, tu espacio "${username}.loop.org" está activo.`, () => {
         switchView('dashboard');
@@ -378,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentUser = perfil;
       } else {
-        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'] };
+        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '' };
       }
 
       updateNavState();
