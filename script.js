@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Configuración de Supabase
   const SUPABASE_URL = 'https://dcdvscthslbszetogkuv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjZHZzY3Roc2xic3pldG9na3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTU2NDIsImV4cCI6MjEwNzg3MTY0Mn0.vmTxZqdm6_FuD_g8EKAVvbvaKkROMlRPXdcc9O7HYko';
  
@@ -8,12 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
-  // Vistas principales
   const loginView = document.getElementById('loginView');
   const signupView = document.getElementById('signupView');
   const dashboardView = document.getElementById('dashboardView');
 
-  // Enlaces y Botones de Navegación
   const goToSignupLink = document.getElementById('goToSignupLink');
   const goToLoginLink = document.getElementById('goToLoginLink');
   const navSignupBtn = document.getElementById('navSignupBtn');
@@ -24,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const navGuestLogin = document.getElementById('navGuestLogin');
   const navUserLogout = document.getElementById('navUserLogout');
 
-  // Formulario y Modal de Alertas
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
   const customModal = document.getElementById('customModal');
@@ -33,40 +29,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCloseBtn = document.getElementById('modalCloseBtn');
   const forgotPassLink = document.getElementById('forgotPassLink');
 
-  // Elementos del Dashboard / Bitácora
   const dashUsernameText = document.getElementById('dashUsernameText');
   const dashUrlText = document.getElementById('dashUrlText');
   const dashTagsContainer = document.getElementById('dashTagsContainer');
   const dashEditBtn = document.getElementById('dashEditBtn');
   
-  // Elementos de las secciones dinámicas
   const seccionTitulo = document.getElementById('seccion-titulo');
   const seccionSubtitulo = document.getElementById('seccion-subtitulo');
   const botonesPill = document.querySelectorAll('.pill-btn');
   const tabBlog = document.getElementById('tab-blog');
   const tabSobreMi = document.getElementById('tab-sobre-mi');
+  const tabGaleria = document.getElementById('tab-galeria');
   const headerSpotifyCard = document.getElementById('headerSpotifyCard');
 
-  // Elementos editables del espacio
+  const toggleCarouselView = document.getElementById('toggleCarouselView');
+  const toggleCalendarView = document.getElementById('toggleCalendarView');
+  const photosCarouselViewMode = document.getElementById('photosCarouselViewMode');
+  const photosCalendarViewMode = document.getElementById('photosCalendarViewMode');
+
+  const deleteCurrentPhotoBtn = document.getElementById('deleteCurrentPhotoBtn');
+
   const editModal = document.getElementById('editModal');
   const editForm = document.getElementById('editForm');
   const modalEditTitle = document.getElementById('modalEditTitle');
   
-  // Campos del modal Blog
+  const editFieldsBlog = document.querySelector('.edit-fields-blog');
+  const editFieldsSobreMi = document.querySelector('.edit-fields-sobremi');
+  const editFieldsGaleria = document.querySelector('.edit-fields-galeria');
+
   const editBannerFileInput = document.getElementById('editBannerFile');
   const editHeaderTitleInput = document.getElementById('editHeaderTitle');
   const editBioInput = document.getElementById('editBio');
   const editTagsInput = document.getElementById('editTags');
   const editSpotifyUrlInput = document.getElementById('editSpotifyUrl');
-  const editFieldsBlog = document.querySelector('.edit-fields-blog');
 
-  // Campos del modal Sobre Mí
   const editAboutBannerFileInput = document.getElementById('editAboutBannerFile');
   const editAboutBioInput = document.getElementById('editAboutBio');
   const editAboutFavoritesInput = document.getElementById('editAboutFavorites');
   const editAboutLinksInput = document.getElementById('editAboutLinks');
-  const editFieldsSobreMi = document.querySelector('.edit-fields-sobremi');
 
+  const editGalleryFileInput = document.getElementById('editGalleryFile');
+  const editGalleryPhotoTitle = document.getElementById('editGalleryPhotoTitle');
+  const editGalleryPhotoStory = document.getElementById('editGalleryPhotoStory');
   const cancelEditBtn = document.getElementById('cancelEditBtn');
 
   const bannerImg = document.getElementById('bannerImg');
@@ -76,36 +80,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const aboutFavoritesList = document.getElementById('aboutFavoritesList');
   const aboutLinksList = document.getElementById('aboutLinksList');
   const spotifyWidgetFrame = document.getElementById('spotifyWidgetFrame');
+  const updatesList = document.getElementById('updatesList');
 
   let currentUser = null;
   let tempBannerBase64 = null;
   let tempAboutBannerBase64 = null;
+  let tempGalleryBase64 = null;
   let seccionActualActiva = 'blog';
 
+  let currentPhotoSlideIndex = 0;
+  let photosStoriesList = [];
+  let updatesHistoryList = [];
+
   const seccionesInfo = {
-    'blog': {
-      titulo: 'Inicio / Blog',
-      subtitulo: 'archivo cronológico // estado: activo'
-    },
-    'sobre-mi': {
-      titulo: 'Sobre mí',
-      subtitulo: 'perfil del autor // notas personales'
-    },
-    'galeria': {
-      titulo: 'Galería',
-      subtitulo: 'colección visual // fotografías y arte'
-    },
-    'visitas': {
-      titulo: 'Libro de Visitas',
-      subtitulo: 'mensajes de la comunidad // firmar'
-    },
-    'enlaces': {
-      titulo: 'Enlaces',
-      subtitulo: 'rincones recomendados de la web'
-    }
+    'blog': { titulo: 'Inicio / Blog', subtitulo: 'archivo cronologico // estado: activo' },
+    'sobre-mi': { titulo: 'Sobre mi', subtitulo: 'perfil del autor // notas personales' },
+    'galeria': { titulo: 'Galeria', subtitulo: 'historias fotograficas // photo corner' },
+    'visitas': { titulo: 'Libro de Visitas', subtitulo: 'mensajes de la comunidad // firmar' },
+    'enlaces': { titulo: 'Enlaces', subtitulo: 'rincones recomendados de la web' }
   };
 
-  // Manejo de pestañas del menú lateral
   botonesPill.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -120,17 +114,38 @@ document.addEventListener('DOMContentLoaded', () => {
         seccionSubtitulo.textContent = seccionesInfo[claveSeccion].subtitulo;
       }
 
-      if (claveSeccion === 'sobre-mi') {
-        if (tabBlog) tabBlog.classList.add('hidden');
-        if (tabSobreMi) tabSobreMi.classList.remove('hidden');
-        if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
-      } else {
-        if (tabSobreMi) tabSobreMi.classList.add('hidden');
+      if (tabBlog) tabBlog.classList.add('hidden');
+      if (tabSobreMi) tabSobreMi.classList.add('hidden');
+      if (tabGaleria) tabGaleria.classList.add('hidden');
+
+      if (claveSeccion === 'blog') {
         if (tabBlog) tabBlog.classList.remove('hidden');
         if (headerSpotifyCard) headerSpotifyCard.classList.remove('hidden');
+      } else if (claveSeccion === 'sobre-mi') {
+        if (tabSobreMi) tabSobreMi.classList.remove('hidden');
+        if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+      } else if (claveSeccion === 'galeria') {
+        if (tabGaleria) tabGaleria.classList.remove('hidden');
+        if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
       }
     });
   });
+
+  if (toggleCarouselView && toggleCalendarView) {
+    toggleCarouselView.addEventListener('click', () => {
+      toggleCarouselView.classList.add('active');
+      toggleCalendarView.classList.remove('active');
+      photosCarouselViewMode.classList.remove('hidden');
+      photosCalendarViewMode.classList.add('hidden');
+    });
+    toggleCalendarView.addEventListener('click', () => {
+      toggleCalendarView.classList.add('active');
+      toggleCarouselView.classList.remove('active');
+      photosCalendarViewMode.classList.remove('hidden');
+      photosCarouselViewMode.classList.add('hidden');
+      renderLocketCalendar();
+    });
+  }
 
   function switchView(viewName) {
     if (loginView) loginView.classList.add('hidden');
@@ -175,106 +190,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function actualizarReproductorSpotify(url) {
     if (!spotifyWidgetFrame) return;
-
     let embedUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0";
-
     if (url && url.includes("spotify.com/")) {
       let cleanUrl = url.split("?")[0];
       let parts = cleanUrl.split("/");
       let type = parts[parts.length - 2];
       let id = parts[parts.length - 1];
-
       if (id && (type === "playlist" || type === "album" || type === "track")) {
         embedUrl = `https://open.spotify.com/embed/${type}/${id}?utm_source=generator&theme=0`;
       }
     }
-
     spotifyWidgetFrame.src = embedUrl;
   }
 
   function renderDashboard() {
     if (!currentUser) return;
-    
-    // Recuperar respaldo local si existe
-    const localData = localStorage.getItem(`sobre_mi_${currentUser.username}`);
-    if (localData) {
-      try {
-        const parsed = JSON.parse(localData);
-        currentUser.about_bio = currentUser.about_bio || parsed.about_bio;
-        currentUser.about_favorites = currentUser.about_favorites || parsed.about_favorites;
-        currentUser.about_links = currentUser.about_links || parsed.about_links;
-        currentUser.about_banner_url = currentUser.about_banner_url || parsed.about_banner_url;
-      } catch(e) {}
-    }
 
     if (dashUsernameText) dashUsernameText.textContent = currentUser.username;
     if (dashUrlText) dashUrlText.textContent = `${currentUser.username}.loop.org`;
-
-    if (seccionTitulo) {
-      seccionTitulo.textContent = currentUser.header_title || currentUser.headerTitle || "¡HOLA!";
-    }
-
-    if (nowStatusText) {
-      const bioText = currentUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio.";
-      nowStatusText.textContent = `"${bioText}"`;
-    }
+    if (seccionTitulo) seccionTitulo.textContent = currentUser.header_title || "¡HOLA!";
+    if (nowStatusText) nowStatusText.textContent = `"${currentUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio."}"`;
 
     if (bannerImg) {
-      bannerImg.src = currentUser.banner_url || "https://picsum.photos/800/350";
+      if (currentUser.banner_url) { bannerImg.src = currentUser.banner_url; bannerImg.style.display = 'block'; }
+      else { bannerImg.removeAttribute('src'); }
     }
-
     if (aboutBannerImg) {
-      aboutBannerImg.src = currentUser.about_banner_url || "https://picsum.photos/800/250";
+      if (currentUser.about_banner_url) { aboutBannerImg.src = currentUser.about_banner_url; aboutBannerImg.style.display = 'block'; }
+      else { aboutBannerImg.removeAttribute('src'); }
     }
+    if (aboutBioText) aboutBioText.textContent = currentUser.about_bio || "¡Hola! Soy un creador digital navegando en la web...";
 
-    if (aboutBioText) {
-      aboutBioText.textContent = currentUser.about_bio || "¡Hola! Soy un creador digital navegando en la web...";
-    }
-
-    // Renderizar favoritos
     if (aboutFavoritesList) {
       aboutFavoritesList.innerHTML = '';
-      const favs = currentUser.about_favorites || [
-        "Momento del día: 10pm a medianoche",
-        "Libro favorito: Indefenso Humano",
-        "Género de cine: Terror & Suspenso",
-        "Paleta de color: Café, Miel, Oliva, Beige"
-      ];
+      const favs = currentUser.about_favorites || [];
       favs.forEach(item => {
         const li = document.createElement('li');
         const parts = item.split(':');
-        if (parts.length > 1) {
-          li.innerHTML = `<span class="star-icon">✶</span> <strong>${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}`;
-        } else {
-          li.innerHTML = `<span class="star-icon">✶</span> ${item}`;
-        }
+        li.innerHTML = parts.length > 1 ? `<span class="star-icon">✶</span> <strong>${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}` : `<span class="star-icon">✶</span> ${item}`;
         aboutFavoritesList.appendChild(li);
       });
     }
 
-    // Renderizar enlaces de Encuéntrame en...
     if (aboutLinksList) {
       aboutLinksList.innerHTML = '';
-      const links = currentUser.about_links || [
-        "Perfil de Loop: https://loop.org",
-        "GitHub / Código: https://github.com",
-        "Galería de Arte: https://pinterest.com",
-        "Spotify Playlist: https://spotify.com"
-      ];
-      
+      const links = currentUser.about_links || [];
       links.forEach(item => {
         const li = document.createElement('li');
         const parts = item.split(':');
-        if (parts.length > 1) {
-          const name = parts[0].trim();
-          const url = parts.slice(1).join(':').trim();
-          li.innerHTML = `<span class="star-icon">✶</span> <a href="${url}" target="_blank" class="about-link">${name}</a>`;
-        } else {
-          li.innerHTML = `<span class="star-icon">✶</span> <a href="#" class="about-link">${item.trim()}</a>`;
-        }
+        li.innerHTML = parts.length > 1 ? `<span class="star-icon">✶</span> <a href="${parts.slice(1).join(':').trim()}" target="_blank" class="about-link">${parts[0].trim()}</a>` : `<span class="star-icon">✶</span> <a href="#" class="about-link">${item.trim()}</a>`;
         aboutLinksList.appendChild(li);
       });
     }
+
+    photosStoriesList = Array.isArray(currentUser.photos_stories) ? currentUser.photos_stories : [];
+    renderPhotosSlideshow();
+
+    updatesHistoryList = Array.isArray(currentUser.updates_history) ? currentUser.updates_history : [];
+    renderUpdatesList();
 
     actualizarReproductorSpotify(currentUser.spotify_url);
 
@@ -293,86 +266,278 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Modal de edición dinámico
+  function renderUpdatesList() {
+    if (!updatesList) return;
+    updatesList.innerHTML = '';
+
+    if (updatesHistoryList.length === 0) {
+      updatesList.innerHTML = `<p style="opacity: 0.7; font-style: italic; font-size: 0.85rem;">Sin actualizaciones recientes.</p>`;
+      return;
+    }
+
+    updatesHistoryList.forEach((updateObj) => {
+      // Compatibilidad por si hay elementos antiguos guardados solo como texto plano
+      const titleText = typeof updateObj === 'string' ? updateObj : (updateObj.title || "Actualización");
+      const dateSource = typeof updateObj === 'object' && updateObj.date ? updateObj.date : new Date();
+
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'update-item-block';
+
+      const dateObj = new Date(dateSource);
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const formattedDate = `${dateObj.getFullYear()} ${months[dateObj.getMonth()]} ${String(dateObj.getDate()).padStart(2, '0')}`;
+
+      itemDiv.innerHTML = `
+        <span class="update-date-label">${formattedDate}</span>
+        <a href="#" class="update-link-title">${titleText}</a>
+      `;
+
+      const linkEl = itemDiv.querySelector('a');
+      linkEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof updateObj === 'object' && updateObj.type === 'galeria') {
+          const galeriaPill = document.querySelector('[data-seccion="galeria"]');
+          if (galeriaPill) galeriaPill.click();
+          if (toggleCarouselView) toggleCarouselView.click();
+          
+          const targetIndex = photosStoriesList.findIndex(p => p.url === updateObj.photoUrl);
+          if (targetIndex !== -1) {
+            currentPhotoSlideIndex = targetIndex;
+            updateSlidePosition();
+          }
+        } else {
+          const blogPill = document.querySelector('[data-seccion="blog"]');
+          if (blogPill) blogPill.click();
+        }
+      });
+
+      updatesList.appendChild(itemDiv);
+    });
+  }
+
+  function renderPhotosSlideshow() {
+    const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
+    const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
+    const photoCounterIndicator = document.getElementById('photoCounterIndicator');
+    if (!photosSlideshowTrack) return;
+    
+    photosSlideshowTrack.innerHTML = '';
+
+    if (photosStoriesList.length === 0) {
+      photosSlideshowTrack.innerHTML = `<div class="slide-card-large"><p style="font-style:italic; padding:40px; text-align:center;">Sin fotografías registradas</p></div>`;
+      if (photoStoryDisplayText) photoStoryDisplayText.textContent = "Sube tu primera fotografía con historia desde el menú de edición.";
+      if (photoCounterIndicator) photoCounterIndicator.textContent = "0 / 0";
+      if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.add('hidden');
+      return;
+    }
+
+    if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.remove('hidden');
+
+    photosStoriesList.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = 'slide-card-large';
+      card.innerHTML = `<img src="${item.url}" alt="Fotografía">`;
+      photosSlideshowTrack.appendChild(card);
+    });
+    updateSlidePosition();
+  }
+
+  function updateSlidePosition() {
+    const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
+    const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
+    const photoCounterIndicator = document.getElementById('photoCounterIndicator');
+    if (!photosSlideshowTrack) return;
+
+    photosSlideshowTrack.style.transform = `translateX(-${currentPhotoSlideIndex * 100}%)`;
+
+    if (photosStoriesList.length > 0) {
+      if (currentPhotoSlideIndex >= photosStoriesList.length) {
+        currentPhotoSlideIndex = photosStoriesList.length - 1;
+      }
+      const currentItem = photosStoriesList[currentPhotoSlideIndex];
+      if (photoStoryDisplayText) {
+        photoStoryDisplayText.textContent = `"${currentItem.story || "Recuerdo especial"}"`;
+      }
+      if (photoCounterIndicator) {
+        photoCounterIndicator.textContent = `${currentPhotoSlideIndex + 1} / ${photosStoriesList.length}`;
+      }
+    }
+  }
+
+  if (deleteCurrentPhotoBtn) {
+    deleteCurrentPhotoBtn.addEventListener('click', async () => {
+      if (photosStoriesList.length === 0) return;
+      if (!confirm('¿Seguro que deseas eliminar esta fotografía y su historia?')) return;
+
+      photosStoriesList.splice(currentPhotoSlideIndex, 1);
+      if (currentPhotoSlideIndex >= photosStoriesList.length) {
+        currentPhotoSlideIndex = Math.max(0, photosStoriesList.length - 1);
+      }
+
+      currentUser.photos_stories = photosStoriesList;
+      renderPhotosSlideshow();
+
+      if (supabase && currentUser) {
+        await supabase.from('espacios').update({ photos_stories: photosStoriesList }).eq('username', currentUser.username);
+      }
+      showModal('Eliminado', 'La fotografía ha sido borrada.');
+    });
+  }
+
+  const prevPhotoSlide = document.getElementById('prevPhotoSlide');
+  const nextPhotoSlide = document.getElementById('nextPhotoSlide');
+  if (prevPhotoSlide) {
+    prevPhotoSlide.addEventListener('click', () => {
+      if (photosStoriesList.length === 0) return;
+      currentPhotoSlideIndex--;
+      if (currentPhotoSlideIndex < 0) currentPhotoSlideIndex = photosStoriesList.length - 1;
+      updateSlidePosition();
+    });
+  }
+  if (nextPhotoSlide) {
+    nextPhotoSlide.addEventListener('click', () => {
+      if (photosStoriesList.length === 0) return;
+      currentPhotoSlideIndex++;
+      if (currentPhotoSlideIndex >= photosStoriesList.length) currentPhotoSlideIndex = 0;
+      updateSlidePosition();
+    });
+  }
+
+  function renderLocketCalendar() {
+    const locketCalendarContainer = document.getElementById('locketCalendarContainer');
+    if (!locketCalendarContainer) return;
+    locketCalendarContainer.innerHTML = '';
+
+    if (photosStoriesList.length === 0) {
+      locketCalendarContainer.innerHTML = `<p style="font-style:italic; text-align:center; padding:20px;">Sin fotos en el calendario.</p>`;
+      return;
+    }
+
+    const grouped = {};
+    photosStoriesList.forEach((item, index) => {
+      const dateObj = item.date ? new Date(item.date) : new Date();
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const monthYearStr = `${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+      if (!grouped[monthYearStr]) grouped[monthYearStr] = [];
+      grouped[monthYearStr].push({ item, index });
+    });
+
+    for (const [monthKey, photosArr] of Object.entries(grouped)) {
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'locket-month-group';
+      groupDiv.innerHTML = `
+        <h4>${monthKey}</h4>
+        <div class="locket-grid" id="grid_${monthKey.replace(/\s+/g, '_')}"></div>
+      `;
+      locketCalendarContainer.appendChild(groupDiv);
+
+      const gridContent = groupDiv.querySelector('.locket-grid');
+      photosArr.forEach(({ item, index }) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'locket-thumb';
+        thumb.innerHTML = `<img src="${item.url}" alt="Recuerdo">`;
+        thumb.addEventListener('click', () => {
+          toggleCarouselView.click();
+          currentPhotoSlideIndex = index;
+          updateSlidePosition();
+        });
+        gridContent.appendChild(thumb);
+      });
+    }
+  }
+
+  function comprimirImagen(file, maxWidth = 800, quality = 0.7) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   if (dashEditBtn) {
     dashEditBtn.addEventListener('click', () => {
       if (!currentUser) return;
       tempBannerBase64 = null;
       tempAboutBannerBase64 = null;
+      tempGalleryBase64 = null;
+
+      if (editFieldsBlog) editFieldsBlog.classList.add('hidden');
+      if (editFieldsSobreMi) editFieldsSobreMi.classList.add('hidden');
+      if (editFieldsGaleria) editFieldsGaleria.classList.add('hidden');
 
       if (seccionActualActiva === 'sobre-mi') {
         if (modalEditTitle) modalEditTitle.textContent = "Personalizar Sección 'Sobre Mí'";
-        if (editFieldsBlog) editFieldsBlog.classList.add('hidden');
         if (editFieldsSobreMi) editFieldsSobreMi.classList.remove('hidden');
-
         if (editAboutBioInput) editAboutBioInput.value = currentUser.about_bio || "";
-        if (editAboutFavoritesInput) {
-          const favs = currentUser.about_favorites || [
-            "Momento del día: 10pm a medianoche",
-            "Libro favorito: Indefenso Humano",
-            "Género de cine: Terror & Suspenso",
-            "Paleta de color: Café, Miel, Oliva, Beige"
-          ];
-          editAboutFavoritesInput.value = favs.join('\n');
-        }
-        if (editAboutLinksInput) {
-          const links = currentUser.about_links || [
-            "Perfil de Loop: https://loop.org",
-            "GitHub / Código: https://github.com",
-            "Galería de Arte: https://pinterest.com",
-            "Spotify Playlist: https://spotify.com"
-          ];
-          editAboutLinksInput.value = links.join('\n');
-        }
+        if (editAboutFavoritesInput) editAboutFavoritesInput.value = (currentUser.about_favorites || []).join('\n');
+        if (editAboutLinksInput) editAboutLinksInput.value = (currentUser.about_links || []).join('\n');
+      } else if (seccionActualActiva === 'galeria') {
+        if (modalEditTitle) modalEditTitle.textContent = "Añadir Fotografía al Photo Corner";
+        if (editFieldsGaleria) editFieldsGaleria.classList.remove('hidden');
+        if (editGalleryPhotoTitle) editGalleryPhotoTitle.value = "";
+        if (editGalleryPhotoStory) editGalleryPhotoStory.value = "";
       } else {
         if (modalEditTitle) modalEditTitle.textContent = "Personalizar Mi Espacio (Inicio)";
         if (editFieldsBlog) editFieldsBlog.classList.remove('hidden');
-        if (editFieldsSobreMi) editFieldsSobreMi.classList.add('hidden');
-
         if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || "¡HOLA!";
         if (editBioInput) editBioInput.value = currentUser.bio || "";
         if (editTagsInput) editTagsInput.value = currentUser.tags ? currentUser.tags.join(', ') : '';
         if (editSpotifyUrlInput) editSpotifyUrlInput.value = currentUser.spotify_url || "";
       }
-      
       if (editModal) editModal.classList.remove('hidden');
     });
   }
 
   if (cancelEditBtn) {
-    cancelEditBtn.addEventListener('click', () => {
-      if (editModal) editModal.classList.add('hidden');
-    });
+    cancelEditBtn.addEventListener('click', () => { if (editModal) editModal.classList.add('hidden'); });
   }
 
-  // Conversiones a Base64 para imágenes
   if (editBannerFileInput) {
-    editBannerFileInput.addEventListener('change', (e) => {
+    editBannerFileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => { tempBannerBase64 = event.target.result; };
-        reader.readAsDataURL(file);
-      }
+      if (file) tempBannerBase64 = await comprimirImagen(file, 900, 0.75);
     });
   }
 
   if (editAboutBannerFileInput) {
-    editAboutBannerFileInput.addEventListener('change', (e) => {
+    editAboutBannerFileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => { tempAboutBannerBase64 = event.target.result; };
-        reader.readAsDataURL(file);
-      }
+      if (file) tempAboutBannerBase64 = await comprimirImagen(file, 900, 0.75);
     });
   }
 
-  // Guardar cambios del formulario de edición
+  if (editGalleryFileInput) {
+    editGalleryFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) tempGalleryBase64 = await comprimirImagen(file, 800, 0.7);
+    });
+  }
+
   if (editForm) {
     editForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       let payload = {};
+      let updateItem = null;
 
       if (seccionActualActiva === 'sobre-mi') {
         const nuevaAboutBio = editAboutBioInput.value.trim();
@@ -391,6 +556,25 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser.about_bio = nuevaAboutBio;
         currentUser.about_favorites = favsArray;
         currentUser.about_links = linksArray;
+        updateItem = { title: "actualización de perfil 'Sobre Mí'", type: 'blog', date: new Date().toISOString() };
+
+      } else if (seccionActualActiva === 'galeria') {
+        const photoTitle = editGalleryPhotoTitle.value.trim() || "Nueva fotografía";
+        const photoStory = editGalleryPhotoStory.value.trim() || "Recuerdo especial";
+        const imgUrl = tempGalleryBase64;
+
+        if (!imgUrl) {
+          showModal('Imagen requerida', 'Por favor selecciona un archivo de imagen para subir.');
+          return;
+        }
+
+        photosStoriesList.push({ url: imgUrl, title: photoTitle, story: photoStory, date: new Date().toISOString() });
+        currentUser.photos_stories = photosStoriesList;
+        payload.photos_stories = photosStoriesList;
+        currentPhotoSlideIndex = photosStoriesList.length - 1;
+        renderPhotosSlideshow();
+        
+        updateItem = { title: photoTitle, type: 'galeria', photoUrl: imgUrl, date: new Date().toISOString() };
 
       } else {
         const nuevoTitulo = editHeaderTitleInput.value.trim() || "¡HOLA!";
@@ -399,12 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
         const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
 
-        payload = {
-          header_title: nuevoTitulo,
-          bio: nuevaBio,
-          tags: tagsArray,
-          spotify_url: nuevoSpotifyUrl
-        };
+        payload = { header_title: nuevoTitulo, bio: nuevaBio, tags: tagsArray, spotify_url: nuevoSpotifyUrl };
 
         if (tempBannerBase64) {
           payload.banner_url = tempBannerBase64;
@@ -415,29 +594,28 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser.bio = nuevaBio;
         currentUser.tags = tagsArray;
         currentUser.spotify_url = nuevoSpotifyUrl;
+        updateItem = { title: nuevoTitulo, type: 'blog', date: new Date().toISOString() };
       }
 
-      // Actualizar en Supabase (con respaldo local)
-      if (supabase && currentUser) {
-        const { error } = await supabase
-          .from('espacios')
-          .update(payload)
-          .eq('username', currentUser.username);
+      if (updateItem) {
+        updatesHistoryList.unshift(updateItem);
+        if (updatesHistoryList.length > 5) updatesHistoryList.pop();
+        currentUser.updates_history = updatesHistoryList;
+        payload.updates_history = updatesHistoryList;
+        renderUpdatesList();
+      }
 
+      if (supabase && currentUser) {
+        const { error } = await supabase.from('espacios').update(payload).eq('username', currentUser.username);
         if (error) {
-          console.warn('Advertencia al guardar en Supabase:', error);
-          localStorage.setItem(`sobre_mi_${currentUser.username}`, JSON.stringify({
-            about_bio: currentUser.about_bio,
-            about_favorites: currentUser.about_favorites,
-            about_links: currentUser.about_links,
-            about_banner_url: currentUser.about_banner_url
-          }));
+          showModal('Error', 'No se pudieron guardar los cambios en Supabase.');
+          return;
         }
       }
 
       renderDashboard();
       if (editModal) editModal.classList.add('hidden');
-      showModal('¡Actualizado!', 'Los cambios de tu espacio se han guardado con éxito.');
+      showModal('¡Actualizado!', 'Los cambios se han guardado con éxito en la nube.');
     });
   }
 
@@ -455,29 +633,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeHandler);
   }
 
-  function validarUsername(username) {
-    return /^[a-z0-9\-]{3,30}$/.test(username);
-  }
+  function validarUsername(username) { return /^[a-z0-9\-]{3,30}$/.test(username); }
+  function validarPassword(password) { return password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password); }
 
-  function validarPassword(password) {
-    return password.length >= 8 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
-  }
-
-  if (forgotPassLink) {
-    forgotPassLink.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = prompt('Ingresa tu correo registrado:');
-      if (!email) return;
-
-      if (supabase) {
-        const { error } = await supabase.auth.resetPasswordForEmail(email);
-        if (error) showModal('Error', error.message);
-        else showModal('Correo enviado', 'Revisa tu correo para recuperar tu contraseña.');
-      }
-    });
-  }
-
-  // REGISTRO
   if (signupForm) {
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -487,51 +645,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('regEmail').value.trim();
       const captchaChecked = document.getElementById('captchaCheck').checked;
 
-      if (!captchaChecked) {
-        showModal('Verificación requerida', 'Por favor confirma que eres humano marcando la casilla.');
-        return;
-      }
-
-      if (!validarUsername(username)) {
-        showModal('Nombre inválido', 'El usuario debe ser en minúsculas, números y guiones (3-30 caracteres).');
-        return;
-      }
-
-      if (!validarPassword(password)) {
-        showModal('Contraseña débil', 'La contraseña debe tener al menos 8 caracteres con letras y números.');
-        return;
-      }
+      if (!captchaChecked) { showModal('Verificacion requerida', 'Por favor confirma que eres humano.'); return; }
+      if (!validarUsername(username)) { showModal('Nombre invalido', 'Usa minusculas, numeros y guiones (3-30 caracteres).'); return; }
+      if (!validarPassword(password)) { showModal('Contrasena debil', 'Minimo 8 caracteres con letras y numeros.'); return; }
 
       const tagsArray = tagsInput ? tagsInput.split(',').map(t => t.trim()) : ['creatividad', 'loop'];
 
       if (supabase) {
         const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-
-        if (authError) {
-          showModal('Error de registro', authError.message);
-          return;
-        }
-
+        if (authError) { showModal('Error de registro', authError.message); return; }
         const userId = authData.user.id;
-        const { error: dbError } = await supabase
-          .from('espacios')
-          .insert([{ id: userId, username, email, tags: tagsArray, spotify_url: '' }]);
-
-        if (dbError) {
-          showModal('Error en el servidor', 'El nombre de usuario o correo ya existe.');
-          return;
-        }
+        const { error: dbError } = await supabase.from('espacios').insert([{ id: userId, username, email, tags: tagsArray, spotify_url: '', photos_stories: [], updates_history: [] }]);
+        if (dbError) { showModal('Error en el servidor', 'El usuario o correo ya existe.'); return; }
       }
 
-      currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '', spotify_url: '' };
+      currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '', spotify_url: '', photos_stories: [], updates_history: [] };
       updateNavState();
-      showModal('¡Espacio Creado!', `Felicidades, tu espacio "${username}.loop.org" está activo.`, () => {
-        switchView('dashboard');
-      });
+      showModal('¡Espacio Creado!', `Felicidades, tu espacio "${username}.loop.org" esta activo.`, () => { switchView('dashboard'); });
     });
   }
 
-  // INICIO DE SESIÓN
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -539,67 +672,35 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('loginPassword').value;
 
       if (supabase) {
-        const { data: perfil, error: perfilError } = await supabase
-          .from('espacios')
-          .select('*')
-          .eq('username', usernameInput)
-          .single();
-
-        if (perfilError || !perfil) {
-          showModal('Error de acceso', 'El usuario no existe en Loop.');
-          return;
-        }
-
-        const { error } = await supabase.auth.signInWithPassword({
-          email: perfil.email,
-          password: password
-        });
-
-        if (error) {
-          showModal('Credenciales incorrectas', 'Contraseña no válida.');
-          return;
-        }
-
+        const { data: perfil, error: perfilError } = await supabase.from('espacios').select('*').eq('username', usernameInput).single();
+        if (perfilError || !perfil) { showModal('Error de acceso', 'El usuario no existe en Loop.'); return; }
+        const { error } = await supabase.auth.signInWithPassword({ email: perfil.email, password: password });
+        if (error) { showModal('Credenciales incorrectas', 'Contrasena no valida.'); return; }
         currentUser = perfil;
       } else {
-        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '' };
+        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [] };
       }
 
       updateNavState();
-      showModal('¡Bienvenido!', `Accediendo a tu espacio ${currentUser.username}.loop.org...`, () => {
-        switchView('dashboard');
-      });
+      showModal('¡Bienvenido!', `Accediendo al espacio ${currentUser.username}.loop.org...`, () => { switchView('dashboard'); });
     });
   }
 
-  // CERRAR SESIÓN
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       if (supabase) await supabase.auth.signOut();
       currentUser = null;
       updateNavState();
-      showModal('Sesión Cerrada', 'Has salido de tu cuenta.', () => {
-        switchView('login');
-      });
+      showModal('Sesion Cerrada', 'Has salido de tu cuenta.', () => { switchView('login'); });
     });
   }
 
-  // Verificar sesión persistente al cargar
   async function verificarSesionActiva() {
     if (supabase) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data: perfil } = await supabase
-          .from('espacios')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (perfil) {
-          currentUser = perfil;
-          updateNavState();
-          switchView('dashboard');
-        }
+        const { data: perfil } = await supabase.from('espacios').select('*').eq('id', session.user.id).single();
+        if (perfil) { currentUser = perfil; updateNavState(); switchView('dashboard'); }
       }
     }
   }

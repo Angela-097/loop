@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loop - Expresión Digital</title>
   
-  <!-- Fuentes Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -186,13 +185,11 @@
 
         <div class="dash-section">
           <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; text-transform: uppercase; color: var(--golden-batter); margin-bottom: 8px; font-weight: 700;">Intereses & Etiquetas</h4>
-          <div class="tags-container" id="dashTagsContainer">
-            <!-- Etiquetas cargadas dinámicamente -->
-          </div>
+          <div class="tags-container" id="dashTagsContainer"></div>
         </div>
       </aside>
 
-      <!-- Contenido Derecho (Estilo Hoja de Papel) -->
+      <!-- Contenido Derecho -->
       <section class="journal-content">
         <div>
           <!-- Cabecera Personalizada -->
@@ -202,11 +199,9 @@
               <p id="seccion-subtitulo">pensamiento del día // bitácora personal</p>
             </div>
 
-            <!-- REPRODUCTOR COMPACTO (Visible solo en Inicio / Blog) -->
+            <!-- REPRODUCTOR COMPACTO -->
             <div class="spotify-header-card" id="headerSpotifyCard">
-              <div class="spotify-header-note">
-                ♫ Una pequeña playlist para tu visita
-              </div>
+              <div class="spotify-header-note">Una pequeña playlist para tu visita</div>
               <div class="spotify-iframe-wrapper">
                 <iframe 
                   id="spotifyWidgetFrame" 
@@ -225,21 +220,19 @@
           <!-- PESTAÑA 1: INICIO / BLOG -->
           <div id="tab-blog" class="tab-content">
             <div class="banner-container" id="bannerDisplay">
-              <img id="bannerImg" src="https://picsum.photos/800/350" alt="Banner del espacio">
+              <img id="bannerImg" src="" alt="Banner del espacio">
             </div>
 
             <div class="journal-sections-grid">
               <div class="journal-box">
                 <h3>Ahora</h3>
-                <p id="nowStatusText">
-                  "Explorando nuevas ideas de diseño, escuchando música y construyendo este espacio."
-                </p>
+                <p id="nowStatusText">"Explorando nuevas ideas de diseño, escuchando música y construyendo este espacio."</p>
               </div>
 
               <div class="journal-box">
                 <h3>Actualizaciones</h3>
-                <div id="updatesList">
-                  <p style="opacity: 0.7; font-style: italic;">Sin publicaciones recientes.</p>
+                <div id="updatesList" class="updates-list-container">
+                  <p style="opacity: 0.7; font-style: italic; font-size: 0.85rem;">Sin actualizaciones recientes.</p>
                 </div>
               </div>
             </div>
@@ -247,40 +240,70 @@
 
           <!-- PESTAÑA 2: SOBRE MÍ -->
           <div id="tab-sobre-mi" class="tab-content hidden">
-            <!-- Biografía Principal -->
             <div class="journal-box about-bio-box">
-              <p id="aboutBioText">
-                ¡Hola! Soy un creador digital navegando en la web. Me apasiona el arte clásico, el cine de terror, la música pop e indie, la fotografía nocturna y construir rincones web acogedores como este.
-              </p>
+              <p id="aboutBioText">¡Hola! Soy un creador digital navegando en la web...</p>
             </div>
 
-            <!-- Grid: Favoritos y Encuéntrame en -->
             <div class="journal-sections-grid" style="margin-top: 20px;">
               <div class="journal-box">
                 <h3 class="about-section-title">Favoritos...</h3>
-                <ul class="about-list" id="aboutFavoritesList">
-                  <li><span class="star-icon">✶</span> <strong>Momento del día:</strong> 10pm a medianoche</li>
-                  <li><span class="star-icon">✶</span> <strong>Libro favorito:</strong> Indefenso Humano</li>
-                  <li><span class="star-icon">✶</span> <strong>Género de cine:</strong> Terror & Suspenso</li>
-                  <li><span class="star-icon">✶</span> <strong>Paleta de color:</strong> Café, Miel, Oliva, Beige</li>
-                </ul>
+                <ul class="about-list" id="aboutFavoritesList"></ul>
               </div>
 
               <div class="journal-box">
                 <h3 class="about-section-title">Encuéntrame en...</h3>
-                <ul class="about-list" id="aboutLinksList">
-                  <li><span class="star-icon">✶</span> <a href="#" class="about-link">Perfil de Loop</a></li>
-                  <li><span class="star-icon">✶</span> <a href="#" class="about-link">GitHub / Código</a></li>
-                  <li><span class="star-icon">✶</span> <a href="#" class="about-link">Galería de Arte</a></li>
-                  <li><span class="star-icon">✶</span> <a href="#" class="about-link">Spotify Playlist</a></li>
-                </ul>
+                <ul class="about-list" id="aboutLinksList"></ul>
               </div>
             </div>
 
-            <!-- Imagen decorativa inferior -->
             <div class="banner-container" id="aboutBannerDisplay" style="margin-top: 20px; max-height: 250px;">
-              <img id="aboutBannerImg" src="https://picsum.photos/800/250" alt="Imagen decorativa sobre mí">
+              <img id="aboutBannerImg" src="" alt="Imagen decorativa sobre mí">
             </div>
+          </div>
+
+          <!-- PESTAÑA 3: GALERÍA -->
+          <div id="tab-galeria" class="tab-content hidden">
+            
+            <div class="gallery-main-card">
+              <div class="photo-corner-topbar">
+                <span class="photo-corner-label">✦ Photo Corner</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar foto actual">🗑️ Eliminar foto</button>
+                  <div class="view-toggle-btns">
+                    <button type="button" id="toggleCarouselView" class="view-switch-btn active">Carrusel</button>
+                    <button type="button" id="toggleCalendarView" class="view-switch-btn">Calendario</button>
+                  </div>
+                </div>
+                <span class="photo-corner-tagline">little moments, big lore.</span>
+              </div>
+
+              <!-- Vista Carrusel Principal -->
+              <div id="photosCarouselViewMode" class="photo-mode-section">
+                <div class="new-carousel-layout">
+                  
+                  <!-- Contenedor de la foto con flechas superpuestas -->
+                  <div class="carousel-image-box">
+                    <button type="button" id="prevPhotoSlide" class="carousel-side-arrow left-arrow">‹</button>
+                    <div class="slideshow-track" id="photosSlideshowTrack"></div>
+                    <button type="button" id="nextPhotoSlide" class="carousel-side-arrow right-arrow">›</button>
+                  </div>
+
+                  <!-- Columna del Post (Espacio del post a un lado) -->
+                  <div class="carousel-post-sidebar">
+                    <h4 class="post-sidebar-title">Historia del Día</h4>
+                    <p id="photoStoryDisplayText" class="post-sidebar-text">Selecciona o sube una fotografía para ver su historia.</p>
+                    <div class="carousel-counter-display" id="photoCounterIndicator">0 / 0</div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Vista Calendario Agrupado por Mes -->
+              <div id="photosCalendarViewMode" class="photo-mode-section hidden">
+                <div class="locket-calendar-container" id="locketCalendarContainer"></div>
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -295,9 +318,7 @@
 
   <!-- Pie de Página -->
   <footer class="footer">
-    <div class="footer-news">
-      Descubre las últimas historias y proyectos en Loop.
-    </div>
+    <div class="footer-news">Descubre las últimas historias y proyectos en Loop.</div>
     <ul class="footer-links">
       <li><a href="#">ACERCA DE</a></li>
       <li><a href="#">NOVEDADES</a></li>
@@ -312,7 +333,6 @@
       <h3 style="text-align: center; margin-bottom: 15px;" id="modalEditTitle">Personalizar Mi Espacio</h3>
       <form id="editForm" style="display: flex; flex-direction: column; gap: 12px;">
         
-        <!-- CAMPOS PARA LA SECCIÓN INICIO / BLOG -->
         <div class="edit-fields-blog">
           <div class="form-group">
             <label for="editBannerFile" style="font-size: 0.78rem;">Imagen de Banner (Inicio)</label>
@@ -320,28 +340,24 @@
               <input type="file" id="editBannerFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
             </div>
           </div>
-
           <div class="form-group">
             <label for="editHeaderTitle" style="font-size: 0.78rem;">Título / Saludo Principal</label>
             <div class="input-wrapper" style="background: #fff;">
               <input type="text" id="editHeaderTitle" placeholder="Ej: ¡HOLA!" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
             </div>
           </div>
-
           <div class="form-group">
             <label for="editBio" style="font-size: 0.78rem;">Frase Corta (Apartado "Ahora")</label>
             <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editBio" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; resize: none; color: var(--cowhide-cocoa);" placeholder="¿Qué estás haciendo ahora?"></textarea>
+              <textarea id="editBio" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
             </div>
           </div>
-
           <div class="form-group">
             <label for="editTags" style="font-size: 0.78rem;">Etiquetas (separadas por comas)</label>
             <div class="input-wrapper" style="background: #fff;">
               <input type="text" id="editTags" placeholder="arte, musica, peliculas" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
             </div>
           </div>
-
           <div class="form-group">
             <label for="editSpotifyUrl" style="font-size: 0.78rem;">Enlace de Playlist de Spotify</label>
             <div class="input-wrapper" style="background: #fff;">
@@ -350,7 +366,6 @@
           </div>
         </div>
 
-        <!-- CAMPOS PARA LA SECCIÓN SOBRE MÍ -->
         <div class="edit-fields-sobremi hidden">
           <div class="form-group">
             <label for="editAboutBannerFile" style="font-size: 0.78rem;">Imagen Inferior (Sobre Mí)</label>
@@ -358,25 +373,44 @@
               <input type="file" id="editAboutBannerFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
             </div>
           </div>
-
           <div class="form-group">
             <label for="editAboutBio" style="font-size: 0.78rem;">Texto de Biografía</label>
             <div class="input-wrapper" style="background: #fff; padding: 4px;">
               <textarea id="editAboutBio" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
             </div>
           </div>
-
           <div class="form-group">
             <label for="editAboutFavorites" style="font-size: 0.78rem;">Favoritos (Formato: Clave: Valor, uno por línea)</label>
             <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editAboutFavorites" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);" placeholder="Momento del día: 10pm a medianoche&#10;Libro favorito: No Longer Human"></textarea>
+              <textarea id="editAboutFavorites" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
             </div>
           </div>
-
           <div class="form-group">
             <label for="editAboutLinks" style="font-size: 0.78rem;">Encuéntrame en... (Formato: Nombre: URL, uno por línea)</label>
             <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editAboutLinks" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);" placeholder="Perfil de Loop: https://loop.org/usuario&#10;GitHub: https://github.com/usuario"></textarea>
+              <textarea id="editAboutLinks" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos separados para la Galería -->
+        <div class="edit-fields-galeria hidden">
+          <div class="form-group">
+            <label for="editGalleryFile" style="font-size: 0.78rem;">Subir Fotografía</label>
+            <div class="input-wrapper" style="background: #fff; padding: 4px;">
+              <input type="file" id="editGalleryFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editGalleryPhotoTitle" style="font-size: 0.78rem;">Título de la Foto (Va a Actualizaciones)</label>
+            <div class="input-wrapper" style="background: #fff;">
+              <input type="text" id="editGalleryPhotoTitle" placeholder="Ej: Noche de hoguera en la playa" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px; font-family: 'Outfit', sans-serif;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editGalleryPhotoStory" style="font-size: 0.78rem;">Historia / Post (Corto o largo para el carrusel)</label>
+            <div class="input-wrapper" style="background: #fff; padding: 4px;">
+              <textarea id="editGalleryPhotoStory" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);" placeholder="Escribe aquí la historia completa de este recuerdo..."></textarea>
             </div>
           </div>
         </div>
@@ -390,7 +424,6 @@
     </div>
   </div>
 
-  <!-- Modal personalizado de mensajes -->
   <div id="customModal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 id="modalTitle">Mensaje</h3>
@@ -399,9 +432,7 @@
     </div>
   </div>
 
-  <!-- Cliente CDN de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Lógica de JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
