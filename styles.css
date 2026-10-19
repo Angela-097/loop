@@ -650,7 +650,7 @@ body {
   font-weight: 600;
 }
 
-/* Tarjeta del reproductor compacto en la esquina superior derecha*/
+/* Tarjeta del reproductor compacto en la esquina superior derecha */
 .spotify-header-card {
   background-color: #faf6f0;
   border: 1px dashed var(--olive-harvest);
@@ -662,13 +662,12 @@ body {
 
 .spotify-header-note {
   font-family: 'Playfair Display', serif;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-style: italic;
   color: var(--spiced-wine);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   font-weight: 600;
-  text-align: right; 
-  padding-right: 4px;
+  text-align: right;
 }
 
 .spotify-iframe-wrapper {
@@ -676,7 +675,7 @@ body {
   overflow: hidden;
   border: 1px solid var(--toasted-caramel);
   background: #000;
-  height: 152px
+  height: 152px;
 }
 
 /* Estilo para el Banner */
@@ -726,6 +725,64 @@ body {
   color: var(--cowhide-cocoa);
   font-style: italic;
   line-height: 1.5;
+}
+
+/* Estilos para la sección Sobre Mí (Indie-Web style) */
+.about-bio-box {
+  background-color: #faf6f0;
+  border: 1px dashed var(--olive-harvest);
+  padding: 22px;
+  border-radius: 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--cowhide-cocoa);
+}
+
+.about-section-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.3rem !important;
+  color: var(--spiced-wine);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--olive-harvest);
+  padding-bottom: 4px;
+}
+
+.about-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--cowhide-cocoa);
+}
+
+.about-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.star-icon {
+  color: var(--toasted-caramel);
+  font-size: 0.9rem;
+}
+
+.about-list a.about-link {
+  color: var(--spiced-wine);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dotted var(--spiced-wine);
+  transition: all 0.2s ease;
+}
+
+.about-list a.about-link:hover {
+  color: var(--toasted-caramel);
+  border-bottom: 1px solid var(--toasted-caramel);
+  background-color: rgba(132, 89, 43, 0.08);
+  padding: 0 4px;
+  border-radius: 4px;
 }
 
 .journal-footer-note {

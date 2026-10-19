@@ -43,23 +43,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const seccionTitulo = document.getElementById('seccion-titulo');
   const seccionSubtitulo = document.getElementById('seccion-subtitulo');
   const botonesPill = document.querySelectorAll('.pill-btn');
+  const tabBlog = document.getElementById('tab-blog');
+  const tabSobreMi = document.getElementById('tab-sobre-mi');
+  const headerSpotifyCard = document.getElementById('headerSpotifyCard');
 
-  // Elementos editables del espacio (Banner, Frase Ahora, Spotify)
+  // Elementos editables del espacio
   const editModal = document.getElementById('editModal');
   const editForm = document.getElementById('editForm');
+  const modalEditTitle = document.getElementById('modalEditTitle');
+  
+  // Campos del modal Blog
   const editBannerFileInput = document.getElementById('editBannerFile');
   const editHeaderTitleInput = document.getElementById('editHeaderTitle');
   const editBioInput = document.getElementById('editBio');
   const editTagsInput = document.getElementById('editTags');
   const editSpotifyUrlInput = document.getElementById('editSpotifyUrl');
+  const editFieldsBlog = document.querySelector('.edit-fields-blog');
+
+  // Campos del modal Sobre Mí
+  const editAboutBannerFileInput = document.getElementById('editAboutBannerFile');
+  const editAboutBioInput = document.getElementById('editAboutBio');
+  const editAboutFavoritesInput = document.getElementById('editAboutFavorites');
+  const editAboutLinksInput = document.getElementById('editAboutLinks');
+  const editFieldsSobreMi = document.querySelector('.edit-fields-sobremi');
+
   const cancelEditBtn = document.getElementById('cancelEditBtn');
 
   const bannerImg = document.getElementById('bannerImg');
+  const aboutBannerImg = document.getElementById('aboutBannerImg');
   const nowStatusText = document.getElementById('nowStatusText');
+  const aboutBioText = document.getElementById('aboutBioText');
+  const aboutFavoritesList = document.getElementById('aboutFavoritesList');
+  const aboutLinksList = document.getElementById('aboutLinksList');
   const spotifyWidgetFrame = document.getElementById('spotifyWidgetFrame');
 
   let currentUser = null;
   let tempBannerBase64 = null;
+  let tempAboutBannerBase64 = null;
+  let seccionActualActiva = 'blog';
 
   const seccionesInfo = {
     'blog': {
@@ -92,9 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.add('active');
 
       const claveSeccion = btn.getAttribute('data-seccion');
+      seccionActualActiva = claveSeccion;
+
       if (seccionesInfo[claveSeccion] && seccionTitulo && seccionSubtitulo) {
-        seccionTitulo.textContent = currentUser?.headerTitle || seccionesInfo[claveSeccion].titulo;
+        seccionTitulo.textContent = seccionesInfo[claveSeccion].titulo;
         seccionSubtitulo.textContent = seccionesInfo[claveSeccion].subtitulo;
+      }
+
+      if (claveSeccion === 'sobre-mi') {
+        if (tabBlog) tabBlog.classList.add('hidden');
+        if (tabSobreMi) tabSobreMi.classList.remove('hidden');
+        if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+      } else {
+        if (tabSobreMi) tabSobreMi.classList.add('hidden');
+        if (tabBlog) tabBlog.classList.remove('hidden');
+        if (headerSpotifyCard) headerSpotifyCard.classList.remove('hidden');
       }
     });
   });
@@ -140,16 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Función para transformar y actualizar el reproductor de Spotify
   function actualizarReproductorSpotify(url) {
     if (!spotifyWidgetFrame) return;
 
-    let embedUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"; // Default
+    let embedUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0";
 
     if (url && url.includes("spotify.com/")) {
       let cleanUrl = url.split("?")[0];
       let parts = cleanUrl.split("/");
-      let type = parts[parts.length - 2]; // playlist, album, track
+      let type = parts[parts.length - 2];
       let id = parts[parts.length - 1];
 
       if (id && (type === "playlist" || type === "album" || type === "track")) {
@@ -160,37 +192,92 @@ document.addEventListener('DOMContentLoaded', () => {
     spotifyWidgetFrame.src = embedUrl;
   }
 
-  // Renderizar datos del usuario actual en el dashboard
   function renderDashboard() {
     if (!currentUser) return;
     
+    // Recuperar respaldo local si existe
+    const localData = localStorage.getItem(`sobre_mi_${currentUser.username}`);
+    if (localData) {
+      try {
+        const parsed = JSON.parse(localData);
+        currentUser.about_bio = currentUser.about_bio || parsed.about_bio;
+        currentUser.about_favorites = currentUser.about_favorites || parsed.about_favorites;
+        currentUser.about_links = currentUser.about_links || parsed.about_links;
+        currentUser.about_banner_url = currentUser.about_banner_url || parsed.about_banner_url;
+      } catch(e) {}
+    }
+
     if (dashUsernameText) dashUsernameText.textContent = currentUser.username;
     if (dashUrlText) dashUrlText.textContent = `${currentUser.username}.loop.org`;
 
-    // Título de cabecera personalizado
     if (seccionTitulo) {
       seccionTitulo.textContent = currentUser.header_title || currentUser.headerTitle || "¡HOLA!";
     }
 
-    // Frase del apartado "Ahora"
     if (nowStatusText) {
       const bioText = currentUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio.";
       nowStatusText.textContent = `"${bioText}"`;
     }
 
-    // Imagen del Banner
     if (bannerImg) {
-      if (currentUser.banner_url || currentUser.bannerUrl) {
-        bannerImg.src = currentUser.banner_url || currentUser.bannerUrl;
-      } else {
-        bannerImg.src = "https://picsum.photos/800/350";
-      }
+      bannerImg.src = currentUser.banner_url || "https://picsum.photos/800/350";
     }
 
-    // Actualizar Reproductor de Spotify con la URL del usuario
+    if (aboutBannerImg) {
+      aboutBannerImg.src = currentUser.about_banner_url || "https://picsum.photos/800/250";
+    }
+
+    if (aboutBioText) {
+      aboutBioText.textContent = currentUser.about_bio || "¡Hola! Soy un creador digital navegando en la web...";
+    }
+
+    // Renderizar favoritos
+    if (aboutFavoritesList) {
+      aboutFavoritesList.innerHTML = '';
+      const favs = currentUser.about_favorites || [
+        "Momento del día: 10pm a medianoche",
+        "Libro favorito: Indefenso Humano",
+        "Género de cine: Terror & Suspenso",
+        "Paleta de color: Café, Miel, Oliva, Beige"
+      ];
+      favs.forEach(item => {
+        const li = document.createElement('li');
+        const parts = item.split(':');
+        if (parts.length > 1) {
+          li.innerHTML = `<span class="star-icon">✶</span> <strong>${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}`;
+        } else {
+          li.innerHTML = `<span class="star-icon">✶</span> ${item}`;
+        }
+        aboutFavoritesList.appendChild(li);
+      });
+    }
+
+    // Renderizar enlaces de Encuéntrame en...
+    if (aboutLinksList) {
+      aboutLinksList.innerHTML = '';
+      const links = currentUser.about_links || [
+        "Perfil de Loop: https://loop.org",
+        "GitHub / Código: https://github.com",
+        "Galería de Arte: https://pinterest.com",
+        "Spotify Playlist: https://spotify.com"
+      ];
+      
+      links.forEach(item => {
+        const li = document.createElement('li');
+        const parts = item.split(':');
+        if (parts.length > 1) {
+          const name = parts[0].trim();
+          const url = parts.slice(1).join(':').trim();
+          li.innerHTML = `<span class="star-icon">✶</span> <a href="${url}" target="_blank" class="about-link">${name}</a>`;
+        } else {
+          li.innerHTML = `<span class="star-icon">✶</span> <a href="#" class="about-link">${item.trim()}</a>`;
+        }
+        aboutLinksList.appendChild(li);
+      });
+    }
+
     actualizarReproductorSpotify(currentUser.spotify_url);
 
-    // Etiquetas dinámicas
     if (dashTagsContainer) {
       dashTagsContainer.innerHTML = '';
       if (currentUser.tags && currentUser.tags.length > 0) {
@@ -206,16 +293,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Modal de edición de espacio
+  // Modal de edición dinámico
   if (dashEditBtn) {
     dashEditBtn.addEventListener('click', () => {
       if (!currentUser) return;
-      if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || currentUser.headerTitle || "¡HOLA!";
-      if (editBioInput) editBioInput.value = currentUser.bio || "";
-      if (editTagsInput) editTagsInput.value = currentUser.tags ? currentUser.tags.join(', ') : '';
-      if (editSpotifyUrlInput) editSpotifyUrlInput.value = currentUser.spotify_url || "";
-      
       tempBannerBase64 = null;
+      tempAboutBannerBase64 = null;
+
+      if (seccionActualActiva === 'sobre-mi') {
+        if (modalEditTitle) modalEditTitle.textContent = "Personalizar Sección 'Sobre Mí'";
+        if (editFieldsBlog) editFieldsBlog.classList.add('hidden');
+        if (editFieldsSobreMi) editFieldsSobreMi.classList.remove('hidden');
+
+        if (editAboutBioInput) editAboutBioInput.value = currentUser.about_bio || "";
+        if (editAboutFavoritesInput) {
+          const favs = currentUser.about_favorites || [
+            "Momento del día: 10pm a medianoche",
+            "Libro favorito: Indefenso Humano",
+            "Género de cine: Terror & Suspenso",
+            "Paleta de color: Café, Miel, Oliva, Beige"
+          ];
+          editAboutFavoritesInput.value = favs.join('\n');
+        }
+        if (editAboutLinksInput) {
+          const links = currentUser.about_links || [
+            "Perfil de Loop: https://loop.org",
+            "GitHub / Código: https://github.com",
+            "Galería de Arte: https://pinterest.com",
+            "Spotify Playlist: https://spotify.com"
+          ];
+          editAboutLinksInput.value = links.join('\n');
+        }
+      } else {
+        if (modalEditTitle) modalEditTitle.textContent = "Personalizar Mi Espacio (Inicio)";
+        if (editFieldsBlog) editFieldsBlog.classList.remove('hidden');
+        if (editFieldsSobreMi) editFieldsSobreMi.classList.add('hidden');
+
+        if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || "¡HOLA!";
+        if (editBioInput) editBioInput.value = currentUser.bio || "";
+        if (editTagsInput) editTagsInput.value = currentUser.tags ? currentUser.tags.join(', ') : '';
+        if (editSpotifyUrlInput) editSpotifyUrlInput.value = currentUser.spotify_url || "";
+      }
+      
       if (editModal) editModal.classList.remove('hidden');
     });
   }
@@ -226,48 +345,79 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Convertir imagen de galería a Base64
+  // Conversiones a Base64 para imágenes
   if (editBannerFileInput) {
     editBannerFileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(event) {
-          tempBannerBase64 = event.target.result;
-        };
+        reader.onload = (event) => { tempBannerBase64 = event.target.result; };
         reader.readAsDataURL(file);
       }
     });
   }
 
-  // Guardar cambios de edición
+  if (editAboutBannerFileInput) {
+    editAboutBannerFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => { tempAboutBannerBase64 = event.target.result; };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Guardar cambios del formulario de edición
   if (editForm) {
     editForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const nuevoTitulo = editHeaderTitleInput.value.trim() || "¡HOLA!";
-      const nuevaBio = editBioInput.value.trim();
-      const nuevasTagsStr = editTagsInput.value.trim();
-      const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
-      const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
+      let payload = {};
 
-      const payload = {
-        header_title: nuevoTitulo,
-        bio: nuevaBio,
-        tags: tagsArray,
-        spotify_url: nuevoSpotifyUrl
-      };
+      if (seccionActualActiva === 'sobre-mi') {
+        const nuevaAboutBio = editAboutBioInput.value.trim();
+        const favsArray = editAboutFavoritesInput.value.trim() ? editAboutFavoritesInput.value.split('\n').map(f => f.trim()).filter(f => f) : [];
+        const linksArray = editAboutLinksInput.value.trim() ? editAboutLinksInput.value.split('\n').map(l => l.trim()).filter(l => l) : [];
 
-      if (tempBannerBase64) {
-        payload.banner_url = tempBannerBase64;
-        currentUser.banner_url = tempBannerBase64;
+        payload.about_bio = nuevaAboutBio;
+        payload.about_favorites = favsArray;
+        payload.about_links = linksArray;
+
+        if (tempAboutBannerBase64) {
+          payload.about_banner_url = tempAboutBannerBase64;
+          currentUser.about_banner_url = tempAboutBannerBase64;
+        }
+
+        currentUser.about_bio = nuevaAboutBio;
+        currentUser.about_favorites = favsArray;
+        currentUser.about_links = linksArray;
+
+      } else {
+        const nuevoTitulo = editHeaderTitleInput.value.trim() || "¡HOLA!";
+        const nuevaBio = editBioInput.value.trim();
+        const nuevasTagsStr = editTagsInput.value.trim();
+        const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
+        const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
+
+        payload = {
+          header_title: nuevoTitulo,
+          bio: nuevaBio,
+          tags: tagsArray,
+          spotify_url: nuevoSpotifyUrl
+        };
+
+        if (tempBannerBase64) {
+          payload.banner_url = tempBannerBase64;
+          currentUser.banner_url = tempBannerBase64;
+        }
+
+        currentUser.header_title = nuevoTitulo;
+        currentUser.bio = nuevaBio;
+        currentUser.tags = tagsArray;
+        currentUser.spotify_url = nuevoSpotifyUrl;
       }
 
-      currentUser.header_title = nuevoTitulo;
-      currentUser.bio = nuevaBio;
-      currentUser.tags = tagsArray;
-      currentUser.spotify_url = nuevoSpotifyUrl;
-
-      // Actualizar en Supabase
+      // Actualizar en Supabase (con respaldo local)
       if (supabase && currentUser) {
         const { error } = await supabase
           .from('espacios')
@@ -275,8 +425,13 @@ document.addEventListener('DOMContentLoaded', () => {
           .eq('username', currentUser.username);
 
         if (error) {
-          showModal('Error', 'No se pudieron guardar los cambios en el servidor.');
-          return;
+          console.warn('Advertencia al guardar en Supabase:', error);
+          localStorage.setItem(`sobre_mi_${currentUser.username}`, JSON.stringify({
+            about_bio: currentUser.about_bio,
+            about_favorites: currentUser.about_favorites,
+            about_links: currentUser.about_links,
+            about_banner_url: currentUser.about_banner_url
+          }));
         }
       }
 
