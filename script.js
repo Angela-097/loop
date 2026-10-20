@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
+  const landingView = document.getElementById('landingView');
   const loginView = document.getElementById('loginView');
   const signupView = document.getElementById('signupView');
   const dashboardView = document.getElementById('dashboardView');
@@ -15,19 +16,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const goToLoginLink = document.getElementById('goToLoginLink');
   const navSignupBtn = document.getElementById('navSignupBtn');
   const navLoginBtn = document.getElementById('navLoginBtn');
+  const heroCtaBtn = document.getElementById('heroCtaBtn');
+  const finalCtaBtn = document.getElementById('finalCtaBtn');
+  const quickLoginBtn = document.getElementById('quickLoginBtn');
   const brandNav = document.getElementById('brandNav');
   const logoutBtn = document.getElementById('logoutBtn');
   const navGuestLinks = document.getElementById('navGuestLinks');
   const navGuestLogin = document.getElementById('navGuestLogin');
   const navUserLogout = document.getElementById('navUserLogout');
 
+  const selectPlanBtns = document.querySelectorAll('.select-plan-btn');
+  const donateCoffeeBtn = document.getElementById('donateCoffeeBtn');
+  const feedbackBtn = document.getElementById('feedbackBtn');
+
   const loginForm = document.getElementById('loginForm');
   const signupForm = document.getElementById('signupForm');
+
   const customModal = document.getElementById('customModal');
   const modalTitle = document.getElementById('modalTitle');
   const modalMessage = document.getElementById('modalMessage');
   const modalCloseBtn = document.getElementById('modalCloseBtn');
-  const forgotPassLink = document.getElementById('forgotPassLink');
 
   const dashUsernameText = document.getElementById('dashUsernameText');
   const dashUrlText = document.getElementById('dashUrlText');
@@ -46,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleCalendarView = document.getElementById('toggleCalendarView');
   const photosCarouselViewMode = document.getElementById('photosCarouselViewMode');
   const photosCalendarViewMode = document.getElementById('photosCalendarViewMode');
-
   const deleteCurrentPhotoBtn = document.getElementById('deleteCurrentPhotoBtn');
 
   const editModal = document.getElementById('editModal');
@@ -148,17 +155,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function switchView(viewName) {
+    if (landingView) landingView.classList.add('hidden');
     if (loginView) loginView.classList.add('hidden');
     if (signupView) signupView.classList.add('hidden');
     if (dashboardView) dashboardView.classList.add('hidden');
 
     if (viewName === 'signup' && signupView) {
       signupView.classList.remove('hidden');
+    } else if (viewName === 'login' && loginView) {
+      loginView.classList.remove('hidden');
     } else if (viewName === 'dashboard' && dashboardView) {
       dashboardView.classList.remove('hidden');
       renderDashboard();
-    } else if (loginView) {
-      loginView.classList.remove('hidden');
+    } else if (landingView) {
+      landingView.classList.remove('hidden');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -167,12 +177,31 @@ document.addEventListener('DOMContentLoaded', () => {
   if (goToLoginLink) goToLoginLink.addEventListener('click', (e) => { e.preventDefault(); switchView('login'); });
   if (navSignupBtn) navSignupBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('signup'); });
   if (navLoginBtn) navLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('login'); });
+  if (heroCtaBtn) heroCtaBtn.addEventListener('click', () => switchView('signup'));
+  if (finalCtaBtn) finalCtaBtn.addEventListener('click', () => switchView('signup'));
+  if (quickLoginBtn) quickLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchView('login'); });
+
+  selectPlanBtns.forEach(btn => {
+    btn.addEventListener('click', () => switchView('signup'));
+  });
+
+  if (donateCoffeeBtn) {
+    donateCoffeeBtn.addEventListener('click', () => {
+      showModal('Apoyo al Proyecto', '¡Muchas gracias! En el despliegue final aquí se abrirá tu enlace de Ko-fi / Patreon.');
+    });
+  }
+
+  if (feedbackBtn) {
+    feedbackBtn.addEventListener('click', () => {
+      showModal('Feedback & Ideas', 'Puedes enviar tus sugerencias o reportes a nuestro correo oficial: loopangela05@gmail.com');
+    });
+  }
   
   if (brandNav) {
     brandNav.addEventListener('click', (e) => {
       e.preventDefault();
       if (currentUser) switchView('dashboard');
-      else switchView('login');
+      else switchView('landing');
     });
   }
 
@@ -276,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updatesHistoryList.forEach((updateObj) => {
-      // Compatibilidad por si hay elementos antiguos guardados solo como texto plano
       const titleText = typeof updateObj === 'string' ? updateObj : (updateObj.title || "Actualización");
       const dateSource = typeof updateObj === 'object' && updateObj.date ? updateObj.date : new Date();
 
@@ -305,9 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPhotoSlideIndex = targetIndex;
             updateSlidePosition();
           }
-        } else {
-          const blogPill = document.querySelector('[data-seccion="blog"]');
-          if (blogPill) blogPill.click();
         }
       });
 
@@ -556,7 +581,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser.about_bio = nuevaAboutBio;
         currentUser.about_favorites = favsArray;
         currentUser.about_links = linksArray;
-        updateItem = { title: "actualización de perfil 'Sobre Mí'", type: 'blog', date: new Date().toISOString() };
 
       } else if (seccionActualActiva === 'galeria') {
         const photoTitle = editGalleryPhotoTitle.value.trim() || "Nueva fotografía";
@@ -594,7 +618,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser.bio = nuevaBio;
         currentUser.tags = tagsArray;
         currentUser.spotify_url = nuevoSpotifyUrl;
-        updateItem = { title: nuevoTitulo, type: 'blog', date: new Date().toISOString() };
       }
 
       if (updateItem) {
@@ -639,29 +662,64 @@ document.addEventListener('DOMContentLoaded', () => {
   if (signupForm) {
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const username = document.getElementById('regUsername').value.trim().toLowerCase();
       const tagsInput = document.getElementById('regTags').value.trim();
       const password = document.getElementById('regPassword').value;
-      const email = document.getElementById('regEmail').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const captchaChecked = document.getElementById('captchaCheck').checked;
 
-      if (!captchaChecked) { showModal('Verificacion requerida', 'Por favor confirma que eres humano.'); return; }
-      if (!validarUsername(username)) { showModal('Nombre invalido', 'Usa minusculas, numeros y guiones (3-30 caracteres).'); return; }
-      if (!validarPassword(password)) { showModal('Contrasena debil', 'Minimo 8 caracteres con letras y numeros.'); return; }
+      if (!captchaChecked) { showModal('Verificación requerida', 'Por favor confirma que eres humano.'); return; }
+      if (!validarUsername(username)) { showModal('Nombre inválido', 'El usuario debe tener entre 3 y 30 caracteres (letras minúsculas, números y guiones).'); return; }
+      if (!validarPassword(password)) { showModal('Contraseña débil', 'La contraseña debe tener mínimo 8 caracteres e incluir letras y números.'); return; }
 
       const tagsArray = tagsInput ? tagsInput.split(',').map(t => t.trim()) : ['creatividad', 'loop'];
 
       if (supabase) {
+        const { data: existeUser } = await supabase.from('espacios').select('username').eq('username', username).maybeSingle();
+        if (existeUser) {
+          showModal('Usuario no disponible', 'Ese nombre de usuario ya está ocupado. Por favor elige otro.');
+          return;
+        }
+
         const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-        if (authError) { showModal('Error de registro', authError.message); return; }
-        const userId = authData.user.id;
-        const { error: dbError } = await supabase.from('espacios').insert([{ id: userId, username, email, tags: tagsArray, spotify_url: '', photos_stories: [], updates_history: [] }]);
-        if (dbError) { showModal('Error en el servidor', 'El usuario o correo ya existe.'); return; }
+        if (authError) { 
+          if (authError.message.includes('already registered')) {
+            showModal('Correo registrado', 'Este correo ya tiene una cuenta activa. Intenta iniciar sesión.');
+          } else {
+            showModal('Error de autenticación', authError.message);
+          }
+          return; 
+        }
+
+        const userId = authData.user ? authData.user.id : null;
+        
+        if (userId) {
+          const { error: dbError } = await supabase.from('espacios').insert([{ 
+            id: userId, 
+            username, 
+            email, 
+            tags: tagsArray, 
+            spotify_url: '', 
+            photos_stories: [], 
+            updates_history: [] 
+          }]);
+
+          if (dbError) { 
+            showModal('Error en el servidor', dbError.message); 
+            return; 
+          }
+        }
       }
 
       currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '', spotify_url: '', photos_stories: [], updates_history: [] };
       updateNavState();
-      showModal('¡Espacio Creado!', `Felicidades, tu espacio "${username}.loop.org" esta activo.`, () => { switchView('dashboard'); });
+      
+      showModal(
+        '¡Espacio Creado con Éxito!', 
+        `Lo que estás a punto de probar es solo un prototipo, se está preparando la versión final, espero les guste.\n\nBienvenido a tu espacio: ${username}.loop.org`, 
+        () => { switchView('dashboard'); }
+      );
     });
   }
 
@@ -675,14 +733,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data: perfil, error: perfilError } = await supabase.from('espacios').select('*').eq('username', usernameInput).single();
         if (perfilError || !perfil) { showModal('Error de acceso', 'El usuario no existe en Loop.'); return; }
         const { error } = await supabase.auth.signInWithPassword({ email: perfil.email, password: password });
-        if (error) { showModal('Credenciales incorrectas', 'Contrasena no valida.'); return; }
+        if (error) { showModal('Credenciales incorrectas', 'Contraseña no válida.'); return; }
         currentUser = perfil;
       } else {
         currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [] };
       }
 
       updateNavState();
-      showModal('¡Bienvenido!', `Accediendo al espacio ${currentUser.username}.loop.org...`, () => { switchView('dashboard'); });
+      
+      showModal('¡Bienvenido de nuevo!', `Lo que estás a punto de probar es solo un prototipo, se está preparando la versión final, espero les guste.\n\nAccediendo a: ${currentUser.username}.loop.org...`, () => { switchView('dashboard'); });
     });
   }
 
@@ -691,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (supabase) await supabase.auth.signOut();
       currentUser = null;
       updateNavState();
-      showModal('Sesion Cerrada', 'Has salido de tu cuenta.', () => { switchView('login'); });
+      showModal('Sesión Cerrada', 'Has salido de tu cuenta.', () => { switchView('landing'); });
     });
   }
 
@@ -700,9 +759,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const { data: perfil } = await supabase.from('espacios').select('*').eq('id', session.user.id).single();
-        if (perfil) { currentUser = perfil; updateNavState(); switchView('dashboard'); }
+        if (perfil) {
+          currentUser = perfil;
+          updateNavState();
+          switchView('dashboard');
+          return;
+        }
       }
     }
+    switchView('landing');
   }
 
   verificarSesionActiva();

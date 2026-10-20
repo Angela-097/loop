@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loop - Expresión Digital</title>
+  <title>Loop - Plataforma Creativa & Bitácora Digital</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,24 +13,302 @@
 </head>
 <body>
 
-  <!-- Barra Superior -->
+  <!-- ENCABEZADO -->
   <header class="top-bar">
     <div class="brand" id="brandNav">
-      <span class="brand-symbol">∞</span>
       <span class="brand-name">loop</span>
     </div>
-    <ul class="nav-links">
-      <li><a href="#" class="nav-link-btn" data-target="signup">Espacios</a></li>
-      <li><a href="#">Explorar</a></li>
-      <li><a href="#">Comunidad</a></li>
-      <li id="navGuestLinks"><a href="#" class="nav-link-btn" id="navSignupBtn">Crear cuenta</a></li>
-      <li id="navGuestLogin"><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
-      <li id="navUserLogout" class="hidden"><button id="logoutBtn">Cerrar Sesión</button></li>
-    </ul>
+    <nav class="nav-container">
+      <ul class="nav-links">
+        <li><a href="#hero"><span class="nav-icon">✦</span> Inicio</a></li>
+        <li><a href="#presentacion"><span class="nav-icon">✧</span> Conócenos</a></li>
+        <li><a href="#comunidad"><span class="nav-icon">✶</span> Espacios</a></li>
+        <li><a href="#apoyo"><span class="nav-icon">✦</span> Apoyo</a></li>
+        <li><a href="#faq"><span class="nav-icon">✧</span> Duda</a></li>
+        <li id="navGuestLogin"><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
+        <li id="navGuestLinks"><a href="#" class="nav-link-btn highlight-nav" id="navSignupBtn">Crear mi Espacio</a></li>
+        <li id="navUserLogout" class="hidden"><button id="logoutBtn">Cerrar Sesión</button></li>
+      </ul>
+    </nav>
   </header>
 
-  <!-- VISTA 1: INICIO DE SESIÓN -->
-  <div id="loginView" class="view-section">
+  <!-- LANDING PAGE -->
+  <div id="landingView" class="view-section">
+    
+    <section class="landing-hero" id="hero">
+      
+      <!-- Columna Izquierda -->
+      <div class="hero-left-sidebar">
+        <div class="vintage-badge">
+          NEOCITIES VIBES
+        </div>
+
+        <div class="stamp-card">
+          <svg class="stamp-flower-svg" viewBox="0 0 60 60">
+            <path d="M30,10 C35,20 40,20 50,30 C40,40 35,40 30,50 C25,40 20,40 10,30 C20,20 25,20 30,10 Z" fill="#743014"/>
+            <circle cx="30" cy="30" r="5" fill="#E8D1A7"/>
+          </svg>
+          <span class="stamp-label">LOOP POST</span>
+        </div>
+
+        <div class="note-sticker">
+          <div class="vector-pin"></div>
+          <p>Un rincón digital independiente, libre y sin algoritmos para tus ideas y momentos.</p>
+        </div>
+      </div>
+
+      <!-- Tarjeta Central Hero -->
+      <div class="hero-center-card">
+        <div class="hero-header-decoration">
+          <span class="sparkle-icon">✦</span>
+          <span class="badge-tag">Prototipo Abierto & Gratuito</span>
+          <span class="sparkle-icon">✦</span>
+        </div>
+
+        <h1>Tu rincón personal en la web <span class="script-accent">sin algoritmos.</span></h1>
+        
+        <p class="hero-description">
+          Loop es tu bitácora digital vintage para expresar tu arte, compartir pasatiempos, proyectos y recuerdos en un espacio que realmente se siente tuyo.
+        </p>
+
+        <div class="hero-mockup-frame">
+          <div class="window-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="window-title">mi_espacio.loop.org</span>
+          </div>
+          <div class="mockup-content">
+            <div class="mockup-header-bg">
+              <div class="vector-avatar-frame">
+                <svg viewBox="0 0 40 40" width="30" height="30">
+                  <circle cx="20" cy="20" r="18" fill="#743014" />
+                  <path d="M12,28 C12,22 16,20 20,20 C24,20 28,22 28,28" stroke="#E8D1A7" stroke-width="2" fill="none"/>
+                  <circle cx="20" cy="14" r="5" fill="#E8D1A7"/>
+                </svg>
+              </div>
+              <div class="mockup-text">
+                <span class="mockup-name">¡Hola, Bienvenidos!</span>
+                <span class="mockup-sub">pensamiento del día // mi bitácora</span>
+              </div>
+            </div>
+            <div class="mockup-mini-grid">
+              <div class="mini-box">
+                <strong>Ahora...</strong>
+                <p>Escuchando música y diseñando este prototipo.</p>
+              </div>
+              <div class="mini-box">
+                <strong>Nota Rápida</strong>
+                <p>Construyendo la web del futuro recordando el pasado.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="submit-btn main-cta-btn" id="heroCtaBtn">✦ Crear Mi Espacio Gratis ➔</button>
+          <a href="#comunidad" class="secondary-btn">Ver Ejemplos de Espacios</a>
+        </div>
+      </div>
+
+      <div class="hero-right-menu">
+        <span class="menu-header">✦ Secciones</span>
+        <a href="#comunidad" class="pill-side-btn">Galería de Espacios</a>
+        <a href="#apoyo" class="pill-side-btn">Apoya el Prototipo</a>
+        <a href="#diferenciadores" class="pill-side-btn">¿Por qué Loop?</a>
+        <a href="#faq" class="pill-side-btn">Preguntas Frecuentes</a>
+        <a href="#" class="pill-side-btn highlight-side" id="quickLoginBtn">Acceso Usuarios</a>
+      </div>
+    </section>
+
+    <!-- SHOWCASE -->
+    <section class="landing-section" id="comunidad">
+      <div class="section-card">
+        <h2 class="section-title text-center">Inspírate en otros <span class="script-accent-dark">Espacios</span></h2>
+        <p class="section-subtitle text-center">Así es como se verán los rincones creados por la comunidad en Loop.</p>
+
+        <div class="showcase-grid">
+          <div class="showcase-card">
+            <div class="showcase-cover bg-theme-1">
+              <svg viewBox="0 0 50 50" class="cover-vector-icon">
+                <circle cx="25" cy="25" r="20" fill="none" stroke="#743014" stroke-width="3"/>
+                <circle cx="25" cy="25" r="8" fill="#743014"/>
+              </svg>
+            </div>
+            <div class="showcase-info">
+              <h4>angela.loop.org</h4>
+              <span class="showcase-tag">#arte #musica #twice</span>
+              <p>"Bitácora de ilustración, notas y proyectos digitales."</p>
+            </div>
+          </div>
+
+          <div class="showcase-card">
+            <div class="showcase-cover bg-theme-2">
+              <svg viewBox="0 0 50 50" class="cover-vector-icon">
+                <rect x="10" y="10" width="30" height="30" fill="none" stroke="#E8D1A7" stroke-width="3"/>
+                <path d="M10,25 L40,25 M25,10 L25,40" stroke="#E8D1A7" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="showcase-info">
+              <h4>pixel-notes.loop.org</h4>
+              <span class="showcase-tag">#pixelart #dev #journal</span>
+              <p>"Un rincón para compartir proyectos de código y bocetos."</p>
+            </div>
+          </div>
+
+          <div class="showcase-card">
+            <div class="showcase-cover bg-theme-3">
+              <svg viewBox="0 0 50 50" class="cover-vector-icon">
+                <path d="M25,10 C15,10 10,20 10,30 C10,40 20,40 25,35 C30,40 40,40 40,30 C40,20 35,10 25,10 Z" fill="none" stroke="#743014" stroke-width="3"/>
+              </svg>
+            </div>
+            <div class="showcase-info">
+              <h4>cozy-corner.loop.org</h4>
+              <span class="showcase-tag">#libros #fotografia #cafe</span>
+              <p>"Reseñas de libros, diarios de viaje y fotografías analógicas."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section" id="presentacion">
+      <div class="section-card">
+        <h2 class="section-title">El propósito de <span class="script-accent-dark">Loop</span></h2>
+        <p class="section-subtitle">Inspirados en la época dorada de la web personal y la cultura de bitácora.</p>
+        
+        <div class="about-grid">
+          <div class="about-card">
+            <div class="about-card-header">
+              <div class="vector-mini-icon envelope-icon"></div>
+              <h3>Misión & Propósito</h3>
+            </div>
+            <p>Devolver a los creadores el control de su identidad digital, ofreciendo un refugio independiente, cálido y libre de algoritmos que buscan atraparte.</p>
+          </div>
+          <div class="about-card">
+            <div class="about-card-header">
+              <div class="vector-mini-icon palette-icon"></div>
+              <h3>Libertad Creativa</h3>
+            </div>
+            <p>Personaliza tu cabecera, reproduce tu playlist favorita, organiza tus fotos en formato carrusel o calendario y comparte tus notas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section" id="apoyo">
+      <h2 class="section-title text-center">Modelo de Sostenibilidad</h2>
+      <p class="section-subtitle text-center">Loop es 100% gratuito. Sostenemos este prototipo gracias al apoyo de la comunidad.</p>
+
+      <div class="services-grid">
+        <div class="service-card featured-service">
+          <div class="tape-sticker-top-right"></div>
+          <span class="service-badge highlight-badge">✦ Acceso Completo</span>
+          <h3>Espacio Creador</h3>
+          <div class="service-price">GRATIS</div>
+          <p>Crea y personaliza tu rincón personal completo durante la fase de prototipo sin costo alguno.</p>
+          <ul class="service-features">
+            <li>✶ Subdominio tu_nombre.loop.org</li>
+            <li>✶ Bitácora personal y sección "Sobre Mí"</li>
+            <li>✶ Galería Photo Corner (Carrusel + Calendario)</li>
+            <li>✶ Reproductor de música integrado</li>
+          </ul>
+          <button class="submit-btn select-plan-btn" data-plan="free">Crear Mi Cuenta Gratis</button>
+        </div>
+
+        <div class="service-card">
+          <span class="service-badge">Sostén el Proyecto</span>
+          <h3>Invítanos un Café</h3>
+          <div class="service-price">Voluntario</div>
+          <p>Tus donaciones ayudan a cubrir el costo de los servidores y la base de datos en la nube.</p>
+          <ul class="service-features">
+            <li>✶ Apoyo directo al desarrollo</li>
+            <li>✶ Insignia de "Mecenas" en tu perfil</li>
+            <li>✶ Acceso anticipado a nuevos temas retro</li>
+            <li>✶ Infinitas gracias por mantener Loop vivo</li>
+          </ul>
+          <button class="submit-btn support-donation-btn" id="donateCoffeeBtn">Donar un Café (Ko-fi)</button>
+        </div>
+
+        <div class="service-card">
+          <span class="service-badge">Feedback</span>
+          <h3>Comunidad & Ideas</h3>
+          <div class="service-price">Colaborativo</div>
+          <p>¿Tienes sugerencias o quieres colaborar aportando ideas y gráficos para la plataforma?</p>
+          <ul class="service-features">
+            <li>✶ Reporta errores o fallos en el prototipo</li>
+            <li>✶ Sugiere nuevas secciones para tu perfil</li>
+            <li>✶ Sé parte del crecimiento inicial de Loop</li>
+            <li>✶ Comunidad abierta e independiente</li>
+          </ul>
+          <button class="submit-btn support-donation-btn" id="feedbackBtn">Enviar Feedback</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section" id="diferenciadores">
+      <div class="section-card">
+        <h2 class="section-title">¿Por qué elegir <span class="script-accent-dark">Loop</span>?</h2>
+        <p class="section-subtitle">Tres pilares que marcan la diferencia con las redes tradicionales.</p>
+
+        <div class="value-prop-grid">
+          <div class="value-box">
+            <div class="value-stamp">✦ 01</div>
+            <div class="vector-value-graphic icon-sparkle-grid"></div>
+            <h4>Estética Vintage Cuidada</h4>
+            <p>Diseños nostálgicos inspirados en el estilo Neocities, adaptados a estándares modernos y responsivos.</p>
+          </div>
+          <div class="value-box">
+            <div class="value-stamp">✦ 02</div>
+            <div class="vector-value-graphic icon-lock-grid"></div>
+            <h4>Privacidad & Control</h4>
+            <p>Tus datos e historias son tuyos. Guarda tus cambios seguros en la nube sin venta de información a terceros.</p>
+          </div>
+          <div class="value-box">
+            <div class="value-stamp">✦ 03</div>
+            <div class="vector-value-graphic icon-leaf-grid"></div>
+            <h4>Sin Distracciones</h4>
+            <p>Un espacio limpio para leer, escribir y ver fotografías sin anuncios molestos ni algoritmos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section" id="faq">
+      <div class="section-card">
+        <h2 class="section-title">Preguntas Frecuentes & Garantía</h2>
+        <p class="section-subtitle">Resolvemos tus dudas sobre el prototipo.</p>
+
+        <div class="faq-container">
+          <div class="faq-item">
+            <h4>¿Necesito conocimientos de programación para usar Loop?</h4>
+            <p>No, todo se gestiona a través de nuestro panel interactivo visual. Puedes subir imágenes, cambiar textos e integrar listas sin tocar código.</p>
+          </div>
+          <div class="faq-item">
+            <h4>¿Mis datos e imágenes están seguros?</h4>
+            <p>Sí, la información de tu espacio se sincroniza de manera segura con nuestra base de datos en la nube (Supabase).</p>
+          </div>
+          <div class="faq-item">
+            <h4>¿El acceso siempre será gratuito?</h4>
+            <p>Durante toda la fase de prototipo el acceso es libre. Si en el futuro agregamos funciones avanzadas, el plan básico siempre seguirá siendo gratuito.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-cta-final">
+      <div class="cta-box">
+        <div class="cta-sparkles">✦ ✧ ✦</div>
+        <h2>¿Listo para construir tu propio espacio?</h2>
+        <p>Únete a la comunidad de creadores y dale vida a tu bitácora digital en minutos.</p>
+        <button class="submit-btn main-cta-btn" id="finalCtaBtn">★ Comenzar Ahora - Es Gratis</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- VISTA 2: INICIO DE SESIÓN -->
+  <div id="loginView" class="view-section hidden">
     <section class="hero-banner">
       <span class="badge">Plataforma Creativa</span>
       <h1>¡Bienvenido <span class="script-accent">de nuevo!</span></h1>
@@ -61,13 +339,12 @@
 
         <div class="recovery-links">
           <a href="#" id="goToSignupLink" class="highlight-link">¿Aún no tienes una cuenta? Regístrate aquí.</a>
-          <a href="#" class="recovery-link" id="forgotPassLink">¿Olvidaste tu contraseña?</a>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- VISTA 2: REGISTRO -->
+  <!-- VISTA 3: REGISTRO -->
   <div id="signupView" class="view-section hidden">
     <section class="signup-hero">
       <div class="doodle-bg">
@@ -77,7 +354,6 @@
       </div>
       <div class="hero-content-signup">
         <div class="hero-logo-box">
-          <span class="big-symbol">∞</span>
           <span class="big-brand">loop</span>
         </div>
       </div>
@@ -159,11 +435,10 @@
     </main>
   </div>
 
-  <!-- VISTA 3: PANEL DE CONTROL / BITÁCORA VINTAGE (DASHBOARD) -->
+  <!-- VISTA 4: PANEL DE CONTROL / DASHBOARD -->
   <div id="dashboardView" class="view-section hidden">
     <main class="journal-container">
       
-      <!-- Sidebar Izquierdo -->
       <aside class="journal-sidebar">
         <div class="site-brand">
           <span id="dashUsernameText">Creador</span>
@@ -189,17 +464,14 @@
         </div>
       </aside>
 
-      <!-- Contenido Derecho -->
       <section class="journal-content">
         <div>
-          <!-- Cabecera Personalizada -->
           <div class="content-header">
             <div class="header-titles">
               <h1 id="seccion-titulo">¡HOLA!</h1>
               <p id="seccion-subtitulo">pensamiento del día // bitácora personal</p>
             </div>
 
-            <!-- REPRODUCTOR COMPACTO -->
             <div class="spotify-header-card" id="headerSpotifyCard">
               <div class="spotify-header-note">Una pequeña playlist para tu visita</div>
               <div class="spotify-iframe-wrapper">
@@ -217,7 +489,6 @@
             </div>
           </div>
 
-          <!-- PESTAÑA 1: INICIO / BLOG -->
           <div id="tab-blog" class="tab-content">
             <div class="banner-container" id="bannerDisplay">
               <img id="bannerImg" src="" alt="Banner del espacio">
@@ -238,7 +509,6 @@
             </div>
           </div>
 
-          <!-- PESTAÑA 2: SOBRE MÍ -->
           <div id="tab-sobre-mi" class="tab-content hidden">
             <div class="journal-box about-bio-box">
               <p id="aboutBioText">¡Hola! Soy un creador digital navegando en la web...</p>
@@ -261,14 +531,12 @@
             </div>
           </div>
 
-          <!-- PESTAÑA 3: GALERÍA -->
           <div id="tab-galeria" class="tab-content hidden">
-            
             <div class="gallery-main-card">
               <div class="photo-corner-topbar">
                 <span class="photo-corner-label">✦ Photo Corner</span>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                  <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar foto actual">🗑️ Eliminar foto</button>
+                  <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar foto actual">Eliminar foto</button>
                   <div class="view-toggle-btns">
                     <button type="button" id="toggleCarouselView" class="view-switch-btn active">Carrusel</button>
                     <button type="button" id="toggleCalendarView" class="view-switch-btn">Calendario</button>
@@ -277,33 +545,26 @@
                 <span class="photo-corner-tagline">little moments, big lore.</span>
               </div>
 
-              <!-- Vista Carrusel Principal -->
               <div id="photosCarouselViewMode" class="photo-mode-section">
                 <div class="new-carousel-layout">
-                  
-                  <!-- Contenedor de la foto con flechas superpuestas -->
                   <div class="carousel-image-box">
                     <button type="button" id="prevPhotoSlide" class="carousel-side-arrow left-arrow">‹</button>
                     <div class="slideshow-track" id="photosSlideshowTrack"></div>
                     <button type="button" id="nextPhotoSlide" class="carousel-side-arrow right-arrow">›</button>
                   </div>
 
-                  <!-- Columna del Post (Espacio del post a un lado) -->
                   <div class="carousel-post-sidebar">
                     <h4 class="post-sidebar-title">Historia del Día</h4>
                     <p id="photoStoryDisplayText" class="post-sidebar-text">Selecciona o sube una fotografía para ver su historia.</p>
                     <div class="carousel-counter-display" id="photoCounterIndicator">0 / 0</div>
                   </div>
-
                 </div>
               </div>
 
-              <!-- Vista Calendario Agrupado por Mes -->
               <div id="photosCalendarViewMode" class="photo-mode-section hidden">
                 <div class="locket-calendar-container" id="locketCalendarContainer"></div>
               </div>
             </div>
-
           </div>
 
         </div>
@@ -316,18 +577,27 @@
     </main>
   </div>
 
-  <!-- Pie de Página -->
+  <!-- PIE DE PÁGINA -->
   <footer class="footer">
-    <div class="footer-news">Descubre las últimas historias y proyectos en Loop.</div>
+    <div class="footer-left">
+      <div class="footer-news">Loop © 2026 — Plataforma de Expresión Digital</div>
+      <div class="footer-contact">Contacto: loopangela05@gmail.com</div>
+    </div>
+    
+    <div class="footer-center-socials">
+      <a href="https://www.instagram.com/loop.espacios/" target="_blank" class="social-link">Instagram</a>
+      <a href="https://www.facebook.com/share/1HWprbY4ue/" target="_blank" class="social-link">Facebook</a>
+      <a href="https://github.com" target="_blank" class="social-link">GitHub</a>
+    </div>
+
     <ul class="footer-links">
-      <li><a href="#">ACERCA DE</a></li>
-      <li><a href="#">NOVEDADES</a></li>
-      <li><a href="#">TÉRMINOS</a></li>
-      <li><a href="#">CONTACTO</a></li>
+      <li><a href="#hero">INICIO</a></li>
+      <li><a href="#faq">PRIVACIDAD</a></li>
+      <li><a href="#apoyo">APOYO</a></li>
     </ul>
   </footer>
 
-  <!-- MODAL DINÁMICO DE EDICIÓN -->
+  <!-- MODAL DE EDICIÓN -->
   <div id="editModal" class="modal-overlay hidden">
     <div class="modal-box" style="text-align: left; max-width: 480px;">
       <h3 style="text-align: center; margin-bottom: 15px;" id="modalEditTitle">Personalizar Mi Espacio</h3>
@@ -393,7 +663,6 @@
           </div>
         </div>
 
-        <!-- Campos separados para la Galería -->
         <div class="edit-fields-galeria hidden">
           <div class="form-group">
             <label for="editGalleryFile" style="font-size: 0.78rem;">Subir Fotografía</label>
