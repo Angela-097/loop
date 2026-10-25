@@ -181,7 +181,7 @@
               <div class="vector-mini-icon palette-icon"></div>
               <h3>Libertad Creativa</h3>
             </div>
-            <p>Personaliza tu cabecera, reproduce tu playlist favorita, organiza tus fotos en formato carrusel o calendario y comparte tus notas.</p>
+            <p>Personaliza tu cabecera, reproduce tu playlist favorita, organiza tus fotos/videos y comparte tus notas.</p>
           </div>
         </div>
       </div>
@@ -201,7 +201,7 @@
           <ul class="service-features">
             <li>✶ Subdominio tu_nombre.loop.org</li>
             <li>✶ Bitácora personal y sección "Sobre Mí"</li>
-            <li>✶ Galería Photo Corner (Carrusel + Calendario)</li>
+            <li>✶ Galería Photo Corner (Carrusel + Álbum)</li>
             <li>✶ Reproductor de música integrado</li>
           </ul>
           <button class="submit-btn select-plan-btn" data-plan="free">Crear Mi Cuenta Gratis</button>
@@ -464,7 +464,7 @@
         </div>
 
         <div>
-          <!-- CABECERA DIVIDIDA: Título a la Izquierda y Spotify Compacto a la Derecha -->
+          <!-- CABECERA DIVIDIDA -->
           <div class="neo-header-split">
             <div class="neo-header-title-box">
               <h1 id="seccion-titulo" class="neo-main-title">HELLO</h1>
@@ -529,15 +529,16 @@
             </div>
           </div>
 
+          <!-- PESTAÑA DE GALERÍA (CON CARRUSEL Y ÁLBUM MENSUAL) -->
           <div id="tab-galeria" class="tab-content hidden">
             <div class="gallery-main-card">
               <div class="photo-corner-topbar">
                 <span class="photo-corner-label">✦ Photo Corner</span>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                  <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar foto actual">Eliminar foto</button>
+                  <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar elemento actual">Eliminar foto/video</button>
                   <div class="view-toggle-btns">
                     <button type="button" id="toggleCarouselView" class="view-switch-btn active">Carrusel</button>
-                    <button type="button" id="toggleCalendarView" class="view-switch-btn">Calendario</button>
+                    <button type="button" id="toggleCalendarView" class="view-switch-btn">Álbum Mensual</button>
                   </div>
                 </div>
               </div>
@@ -553,7 +554,7 @@
                   <div class="carousel-meta-box">
                     <div>
                       <h4 style="font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine); font-size: 1.1rem; border-bottom: 1px solid var(--olive-harvest); padding-bottom: 4px;">Historia del Día</h4>
-                      <p id="photoStoryDisplayText" style="font-size: 0.88rem; font-style: italic; margin-top: 10px;">Selecciona o sube una fotografía para ver su historia.</p>
+                      <p id="photoStoryDisplayText" style="font-size: 0.88rem; font-style: italic; margin-top: 10px;">Selecciona o sube un elemento para ver su historia.</p>
                     </div>
                     <div class="counter" id="photoCounterIndicator">0 / 0</div>
                   </div>
@@ -566,13 +567,19 @@
             </div>
           </div>
 
-          <!-- PESTAÑA DE RESEÑAS / REVIEWS -->
+          <!-- PESTAÑA DE RESEÑAS (CON FILTRO POR MES) -->
           <div id="tab-reviews" class="tab-content hidden">
             <div class="reviews-wrapper-card">
-              <div class="reviews-topbar">
+              <div class="reviews-topbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <span class="reviews-tag-label">✦ DIARIO DE PELÍCULAS & LIBROS</span>
+                <div class="reviews-filter-box" style="display: flex; align-items: center; gap: 6px;">
+                  <label for="reviewMonthFilter" style="font-size: 0.75rem; font-family: 'Space Mono', monospace; color: var(--olive-harvest);">Filtrar mes:</label>
+                  <select id="reviewMonthFilter" style="font-family: 'Space Mono', monospace; font-size: 0.78rem; padding: 3px 6px; border: 1px solid var(--olive-harvest); background: #fdfbf7; border-radius: 4px; color: var(--spiced-wine); outline: none;">
+                    <option value="all">Todos los meses</option>
+                  </select>
+                </div>
               </div>
-              <div class="reviews-grid" id="reviewsGridContainer">
+              <div class="reviews-grid" id="reviewsGridContainer" style="margin-top: 14px;">
                 <!-- Se llenará dinámicamente -->
               </div>
             </div>
@@ -690,13 +697,13 @@
 
         <div class="edit-fields-galeria hidden">
           <div class="form-group">
-            <label for="editGalleryFile">Subir Fotografía</label>
+            <label for="editGalleryFile">Subir Fotografía o Video Corto</label>
             <div class="input-line" style="background: #fff; padding: 4px;">
-              <input type="file" id="editGalleryFile" accept="image/*" class="file-input">
+              <input type="file" id="editGalleryFile" accept="image/*,video/*" class="file-input">
             </div>
           </div>
           <div class="form-group">
-            <label for="editGalleryPhotoTitle">Título de la Foto</label>
+            <label for="editGalleryPhotoTitle">Título del Recuerdo</label>
             <div class="input-line">
               <input type="text" id="editGalleryPhotoTitle" placeholder="Ej: Recuerdo especial">
             </div>

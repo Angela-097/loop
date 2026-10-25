@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const photosCarouselViewMode = document.getElementById('photosCarouselViewMode');
   const photosCalendarViewMode = document.getElementById('photosCalendarViewMode');
   const deleteCurrentPhotoBtn = document.getElementById('deleteCurrentPhotoBtn');
+  const reviewMonthFilter = document.getElementById('reviewMonthFilter');
 
   const editModal = document.getElementById('editModal');
   const editForm = document.getElementById('editForm');
@@ -113,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentUser = null;
   let cropperInstance = null;
   let seccionActualActiva = 'blog';
+  let uploadedMediaBase64 = null;
+  let uploadedMediaType = 'image';
 
   let currentPhotoSlideIndex = 0;
   let photosStoriesList = [];
@@ -157,9 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (claveSeccion === 'galeria') {
         if (tabGaleria) tabGaleria.classList.remove('hidden');
         if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+        renderPhotosSlideshow();
       } else if (claveSeccion === 'reviews') {
         if (tabReviews) tabReviews.classList.remove('hidden');
         if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+        poblarFiltroMesesReseñas();
         renderReviewsGrid();
       } else if (claveSeccion === 'bitacora') {
         if (tabBitacora) tabBitacora.classList.remove('hidden');
@@ -177,18 +182,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // INTERRUPTOR DE VISTAS (CARRUSEL vs ÁLBUM MENSUAL)
   if (toggleCarouselView && toggleCalendarView) {
     toggleCarouselView.addEventListener('click', () => {
       toggleCarouselView.classList.add('active');
       toggleCalendarView.classList.remove('active');
-      photosCarouselViewMode.classList.remove('hidden');
-      photosCalendarViewMode.classList.add('hidden');
+      if (photosCarouselViewMode) photosCarouselViewMode.classList.remove('hidden');
+      if (photosCalendarViewMode) photosCalendarViewMode.classList.add('hidden');
     });
     toggleCalendarView.addEventListener('click', () => {
       toggleCalendarView.classList.add('active');
       toggleCarouselView.classList.remove('active');
-      photosCalendarViewMode.classList.remove('hidden');
-      photosCalendarViewMode.classList.add('hidden');
+      if (photosCalendarViewMode) photosCalendarViewMode.classList.remove('hidden');
+      if (photosCarouselViewMode) photosCarouselViewMode.classList.add('hidden');
       renderLocketCalendar();
     });
   }
@@ -306,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderUpdatesList();
 
     reviewsList = Array.isArray(currentUser.reviews_list) ? currentUser.reviews_list : [];
+    poblarFiltroMesesReseñas();
     renderReviewsGrid();
 
     bitacoraEntriesList = Array.isArray(currentUser.bitacora_entries) ? currentUser.bitacora_entries : [];
@@ -328,6 +335,244 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // RENDER DE CARRUSEL
+  function renderPhotosSlideshow() {
+    const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
+    const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
+    const photoCounterIndicator = document.getElementById('photoCounterIndicator');
+    if (!photosSlideshowTrack) return;
+    
+    photosSlideshowTrack.innerHTML = '';
+
+    if (photosStoriesList.length === 0) {
+      photosSlideshowTrack.innerHTML = `<div class="slide-card-large"><p style="font-style:italic; padding:40px; text-align:center;">Sin fotos ni videos registrados</p></div>`;
+      if (photoStoryDisplayText) photoStoryDisplayText.textContent = "Sube tu primera foto o video con historia desde el menú de edición.";
+      if (photoCounterIndicator) photoCounterIndicator.textContent = "0 / 0";
+      if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.add('hidden');
+      return;
+    }
+
+    if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.remove('hidden');
+
+    photosStoriesList.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = 'slide-card-large';
+      if (item.type === 'video') {
+        card.innerHTML = `<video src="${item.url}" controls style="width:100%; height:100%; object-fit:cover; border-radius:4px;"></video>`;
+      } else {
+        card.innerHTML = `<img src="${item.url}" alt="${item.title || 'Foto'}">`;
+      }
+      photosSlideshowTrack.appendChild(card);
+    });
+    updateSlidePosition();
+  }
+
+  function updateSlidePosition() {
+    const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
+    const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
+    const photoCounterIndicator = document.getElementById('photoCounterIndicator');
+    if (!photosSlideshowTrack) return;
+
+    photosSlideshowTrack.style.transform = `translateX(-${currentPhotoSlideIndex * 100}%)`;
+
+    if (photosStoriesList.length > 0) {
+      if (currentPhotoSlideIndex >= photosStoriesList.length) {
+        currentPhotoSlideIndex = photosStoriesList.length - 1;
+      }
+      const currentItem = photosStoriesList[currentPhotoSlideIndex];
+      if (photoStoryDisplayText) {
+        photoStoryDisplayText.textContent = `"${currentItem.story || "Recuerdo especial"}"`;
+      }
+      if (photoCounterIndicator) {
+        photoCounterIndicator.textContent = `${currentPhotoSlideIndex + 1} / ${photosStoriesList.length}`;
+      }
+    }
+  }
+
+  if (deleteCurrentPhotoBtn) {
+    deleteCurrentPhotoBtn.addEventListener('click', async () => {
+      if (photosStoriesList.length === 0) return;
+      if (!confirm('¿Seguro que deseas eliminar este elemento?')) return;
+
+      photosStoriesList.splice(currentPhotoSlideIndex, 1);
+      if (currentPhotoSlideIndex >= photosStoriesList.length) {
+        currentPhotoSlideIndex = Math.max(0, photosStoriesList.length - 1);
+      }
+
+      currentUser.photos_stories = photosStoriesList;
+      renderPhotosSlideshow();
+      renderLocketCalendar();
+
+      if (supabase && currentUser) {
+        await supabase.from('espacios').update({ photos_stories: photosStoriesList }).eq('username', currentUser.username);
+      }
+      showModal('Eliminado', 'El elemento ha sido borrado.');
+    });
+  }
+
+  const prevPhotoSlide = document.getElementById('prevPhotoSlide');
+  const nextPhotoSlide = document.getElementById('nextPhotoSlide');
+  if (prevPhotoSlide) {
+    prevPhotoSlide.addEventListener('click', () => {
+      if (photosStoriesList.length === 0) return;
+      currentPhotoSlideIndex--;
+      if (currentPhotoSlideIndex < 0) currentPhotoSlideIndex = photosStoriesList.length - 1;
+      updateSlidePosition();
+    });
+  }
+  if (nextPhotoSlide) {
+    nextPhotoSlide.addEventListener('click', () => {
+      if (photosStoriesList.length === 0) return;
+      currentPhotoSlideIndex++;
+      if (currentPhotoSlideIndex >= photosStoriesList.length) currentPhotoSlideIndex = 0;
+      updateSlidePosition();
+    });
+  }
+
+  // RENDER DE ÁLBUM MENSUAL
+  function renderLocketCalendar() {
+    const locketCalendarContainer = document.getElementById('locketCalendarContainer');
+    if (!locketCalendarContainer) return;
+    locketCalendarContainer.innerHTML = '';
+
+    if (photosStoriesList.length === 0) {
+      locketCalendarContainer.innerHTML = `<p style="font-style:italic; text-align:center; padding:20px;">Sin fotos ni videos en el álbum.</p>`;
+      return;
+    }
+
+    const grouped = {};
+    photosStoriesList.forEach((item, index) => {
+      const dateObj = item.date ? new Date(item.date) : new Date();
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const monthYearStr = `${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+      if (!grouped[monthYearStr]) grouped[monthYearStr] = [];
+      grouped[monthYearStr].push({ item, index });
+    });
+
+    for (const [monthKey, photosArr] of Object.entries(grouped)) {
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'locket-month-group';
+      groupDiv.innerHTML = `
+        <h4 style="font-family:'Newsreader', serif; font-style:italic; font-size:1rem; color:var(--spiced-wine); margin-bottom:8px; border-bottom:1px dashed var(--olive-harvest); padding-bottom:4px;">✦ ${monthKey}</h4>
+        <div class="locket-grid" id="grid_${monthKey.replace(/\s+/g, '_')}" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;"></div>
+      `;
+      locketCalendarContainer.appendChild(groupDiv);
+
+      const gridContent = groupDiv.querySelector('.locket-grid');
+      photosArr.forEach(({ item, index }) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'locket-thumb';
+        thumb.style.cssText = 'width: 100%; height: 130px; overflow: hidden; border-radius: 6px; border: 1px solid var(--olive-harvest); cursor: pointer; background: #000; position: relative;';
+        
+        if (item.type === 'video') {
+          thumb.innerHTML = `
+            <video src="${item.url}" style="width:100%; height:100%; object-fit:cover; opacity: 0.85;"></video>
+            <span style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 3px;">▶ VIDEO</span>
+          `;
+        } else {
+          thumb.innerHTML = `<img src="${item.url}" alt="Recuerdo" style="width:100%; height:100%; object-fit:cover;">`;
+        }
+
+        thumb.addEventListener('click', () => {
+          if (toggleCarouselView) toggleCarouselView.click();
+          currentPhotoSlideIndex = index;
+          updateSlidePosition();
+        });
+        gridContent.appendChild(thumb);
+      });
+    }
+  }
+
+  // --- FILTRO DE RESEÑAS POR MES ---
+  function poblarFiltroMesesReseñas() {
+    if (!reviewMonthFilter) return;
+    
+    // Guardar selección actual si existe
+    const selectedVal = reviewMonthFilter.value;
+    reviewMonthFilter.innerHTML = '<option value="all">Todos los meses</option>';
+
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const mesesDisponibles = new Set();
+
+    reviewsList.forEach(rev => {
+      const d = rev.date ? new Date(rev.date) : new Date();
+      const mStr = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      mesesDisponibles.add(mStr);
+    });
+
+    mesesDisponibles.forEach(mKey => {
+      const opt = document.createElement('option');
+      opt.value = mKey;
+      opt.textContent = mKey;
+      reviewMonthFilter.appendChild(opt);
+    });
+
+    reviewMonthFilter.value = selectedVal || 'all';
+  }
+
+  if (reviewMonthFilter) {
+    reviewMonthFilter.addEventListener('change', () => {
+      renderReviewsGrid();
+    });
+  }
+
+  function renderReviewsGrid() {
+    if (!reviewsGridContainer) return;
+    reviewsGridContainer.innerHTML = '';
+
+    const filtroMes = reviewMonthFilter ? reviewMonthFilter.value : 'all';
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    const filteredReviews = reviewsList.filter(rev => {
+      if (filtroMes === 'all') return true;
+      const d = rev.date ? new Date(rev.date) : new Date();
+      const mStr = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      return mStr === filtroMes;
+    });
+
+    if (filteredReviews.length === 0) {
+      reviewsGridContainer.innerHTML = `<p class="empty-note" style="grid-column: 1/-1; padding: 20px; text-align: center;">No hay reseñas registradas para este filtro.</p>`;
+      return;
+    }
+
+    filteredReviews.forEach((rev) => {
+      // Encontrar el índice real en la lista general para poder borrar correctamente
+      const realIndex = reviewsList.findIndex(r => r === rev);
+
+      const card = document.createElement('div');
+      card.className = 'review-card-item';
+      card.innerHTML = `
+        <button type="button" class="delete-review-btn" title="Eliminar reseña">✕</button>
+        <div class="review-poster-box">
+          <img src="${rev.url}" alt="${rev.title}">
+        </div>
+        <h4 class="review-title">${rev.title}</h4>
+        <div class="review-sub">${rev.sub || ''}</div>
+        <div class="review-body-scroll">
+          ${rev.sinopsis ? `<p class="sinopsis-text">${rev.sinopsis}</p>` : ''}
+          <p class="opinion-text">${rev.opinion || ''}</p>
+        </div>
+      `;
+
+      const delBtn = card.querySelector('.delete-review-btn');
+      delBtn.addEventListener('click', async () => {
+        if (!confirm(`¿Eliminar la reseña de "${rev.title}"?`)) return;
+        reviewsList.splice(realIndex, 1);
+        currentUser.reviews_list = reviewsList;
+        poblarFiltroMesesReseñas();
+        renderReviewsGrid();
+
+        if (supabase && currentUser) {
+          await supabase.from('espacios').update({ reviews_list: reviewsList }).eq('username', currentUser.username);
+        }
+        showModal('Eliminado', 'La reseña ha sido borrada.');
+      });
+
+      reviewsGridContainer.appendChild(card);
+    });
+  }
+
   function renderBitacoraSection() {
     const moodboardData = currentUser.moodboard_data || { frase: "", paleta: [], imagenes: [] };
 
@@ -337,13 +582,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (moodboardPaletteContainer) {
       moodboardPaletteContainer.innerHTML = '';
-      const colors = (moodboardData.paleta && moodboardData.paleta.length > 0) ? moodboardData.paleta : ['#743014', '#84592B', '#9D9167', '#E8D1A7'];
+      let colors = (moodboardData.paleta && moodboardData.paleta.length > 0) 
+        ? moodboardData.paleta 
+        : ['#743014', '#84592B', '#9D9167', '#E8D1A7'];
+
       colors.forEach(hex => {
-        const circle = document.createElement('div');
-        circle.className = 'palette-circle';
-        circle.style.backgroundColor = hex.trim();
-        circle.title = hex.trim();
-        moodboardPaletteContainer.appendChild(circle);
+        let cleanHex = hex.toString().replace(/['"]/g, '').trim();
+        if (cleanHex && !cleanHex.startsWith('#')) {
+          cleanHex = '#' + cleanHex;
+        }
+
+        if (cleanHex) {
+          const circle = document.createElement('div');
+          circle.className = 'palette-circle';
+          circle.style.setProperty('background-color', cleanHex, 'important');
+          circle.title = cleanHex;
+          moodboardPaletteContainer.appendChild(circle);
+        }
       });
     }
 
@@ -387,48 +642,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function renderReviewsGrid() {
-    if (!reviewsGridContainer) return;
-    reviewsGridContainer.innerHTML = '';
-
-    if (reviewsList.length === 0) {
-      reviewsGridContainer.innerHTML = `<p class="empty-note" style="grid-column: 1/-1; padding: 20px; text-align: center;">Aún no has agregado reseñas. Presiona 'Editar espacio' para publicar tu primer ranking de película o libro.</p>`;
-      return;
-    }
-
-    reviewsList.forEach((rev, index) => {
-      const card = document.createElement('div');
-      card.className = 'review-card-item';
-      card.innerHTML = `
-        <button type="button" class="delete-review-btn" title="Eliminar reseña">✕</button>
-        <div class="review-poster-box">
-          <img src="${rev.url}" alt="${rev.title}">
-        </div>
-        <h4 class="review-title">${rev.title}</h4>
-        <div class="review-sub">${rev.sub || ''}</div>
-        <div class="review-body-scroll">
-          ${rev.sinopsis ? `<p class="sinopsis-text">${rev.sinopsis}</p>` : ''}
-          <p class="opinion-text">${rev.opinion || ''}</p>
-        </div>
-      `;
-
-      const delBtn = card.querySelector('.delete-review-btn');
-      delBtn.addEventListener('click', async () => {
-        if (!confirm(`¿Eliminar la reseña de "${rev.title}"?`)) return;
-        reviewsList.splice(index, 1);
-        currentUser.reviews_list = reviewsList;
-        renderReviewsGrid();
-
-        if (supabase && currentUser) {
-          await supabase.from('espacios').update({ reviews_list: reviewsList }).eq('username', currentUser.username);
-        }
-        showModal('Eliminado', 'La reseña ha sido borrada.');
-      });
-
-      reviewsGridContainer.appendChild(card);
-    });
-  }
-
   function renderUpdatesList() {
     if (!updatesList) return;
     updatesList.innerHTML = '';
@@ -460,13 +673,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof updateObj === 'object' && updateObj.type === 'galeria') {
           const galeriaPill = document.querySelector('[data-seccion="galeria"]');
           if (galeriaPill) galeriaPill.click();
-          if (toggleCarouselView) toggleCarouselView.click();
-          
-          const targetIndex = photosStoriesList.findIndex(p => p.url === updateObj.photoUrl);
-          if (targetIndex !== -1) {
-            currentPhotoSlideIndex = targetIndex;
-            updateSlidePosition();
-          }
         } else if (typeof updateObj === 'object' && updateObj.type === 'reviews') {
           const reviewsPill = document.querySelector('[data-seccion="reviews"]');
           if (reviewsPill) reviewsPill.click();
@@ -480,140 +686,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function renderPhotosSlideshow() {
-    const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
-    const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
-    const photoCounterIndicator = document.getElementById('photoCounterIndicator');
-    if (!photosSlideshowTrack) return;
-    
-    photosSlideshowTrack.innerHTML = '';
-
-    if (photosStoriesList.length === 0) {
-      photosSlideshowTrack.innerHTML = `<div class="slide-card-large"><p style="font-style:italic; padding:40px; text-align:center;">Sin fotografías registradas</p></div>`;
-      if (photoStoryDisplayText) photoStoryDisplayText.textContent = "Sube tu primera fotografía con historia desde el menú de edición.";
-      if (photoCounterIndicator) photoCounterIndicator.textContent = "0 / 0";
-      if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.add('hidden');
-      return;
-    }
-
-    if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.remove('hidden');
-
-    photosStoriesList.forEach((item) => {
-      const card = document.createElement('div');
-      card.className = 'slide-card-large';
-      card.innerHTML = `<img src="${item.url}" alt="Fotografía">`;
-      photosSlideshowTrack.appendChild(card);
-    });
-    updateSlidePosition();
-  }
-
-  function updateSlidePosition() {
-    const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
-    const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
-    const photoCounterIndicator = document.getElementById('photoCounterIndicator');
-    if (!photosSlideshowTrack) return;
-
-    photosSlideshowTrack.style.transform = `translateX(-${currentPhotoSlideIndex * 100}%)`;
-
-    if (photosStoriesList.length > 0) {
-      if (currentPhotoSlideIndex >= photosStoriesList.length) {
-        currentPhotoSlideIndex = photosStoriesList.length - 1;
-      }
-      const currentItem = photosStoriesList[currentPhotoSlideIndex];
-      if (photoStoryDisplayText) {
-        photoStoryDisplayText.textContent = `"${currentItem.story || "Recuerdo especial"}"`;
-      }
-      if (photoCounterIndicator) {
-        photoCounterIndicator.textContent = `${currentPhotoSlideIndex + 1} / ${photosStoriesList.length}`;
-      }
-    }
-  }
-
-  if (deleteCurrentPhotoBtn) {
-    deleteCurrentPhotoBtn.addEventListener('click', async () => {
-      if (photosStoriesList.length === 0) return;
-      if (!confirm('¿Seguro que deseas eliminar esta fotografía y su historia?')) return;
-
-      photosStoriesList.splice(currentPhotoSlideIndex, 1);
-      if (currentPhotoSlideIndex >= photosStoriesList.length) {
-        currentPhotoSlideIndex = Math.max(0, photosStoriesList.length - 1);
-      }
-
-      currentUser.photos_stories = photosStoriesList;
-      renderPhotosSlideshow();
-
-      if (supabase && currentUser) {
-        await supabase.from('espacios').update({ photos_stories: photosStoriesList }).eq('username', currentUser.username);
-      }
-      showModal('Eliminado', 'La fotografía ha sido borrada.');
-    });
-  }
-
-  const prevPhotoSlide = document.getElementById('prevPhotoSlide');
-  const nextPhotoSlide = document.getElementById('nextPhotoSlide');
-  if (prevPhotoSlide) {
-    prevPhotoSlide.addEventListener('click', () => {
-      if (photosStoriesList.length === 0) return;
-      currentPhotoSlideIndex--;
-      if (currentPhotoSlideIndex < 0) currentPhotoSlideIndex = photosStoriesList.length - 1;
-      updateSlidePosition();
-    });
-  }
-  if (nextPhotoSlide) {
-    nextPhotoSlide.addEventListener('click', () => {
-      if (photosStoriesList.length === 0) return;
-      currentPhotoSlideIndex++;
-      if (currentPhotoSlideIndex >= photosStoriesList.length) currentPhotoSlideIndex = 0;
-      updateSlidePosition();
-    });
-  }
-
-  function renderLocketCalendar() {
-    const locketCalendarContainer = document.getElementById('locketCalendarContainer');
-    if (!locketCalendarContainer) return;
-    locketCalendarContainer.innerHTML = '';
-
-    if (photosStoriesList.length === 0) {
-      locketCalendarContainer.innerHTML = `<p style="font-style:italic; text-align:center; padding:20px;">Sin fotos en el calendario.</p>`;
-      return;
-    }
-
-    const grouped = {};
-    photosStoriesList.forEach((item, index) => {
-      const dateObj = item.date ? new Date(item.date) : new Date();
-      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-      const monthYearStr = `${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-
-      if (!grouped[monthYearStr]) grouped[monthYearStr] = [];
-      grouped[monthYearStr].push({ item, index });
-    });
-
-    for (const [monthKey, photosArr] of Object.entries(grouped)) {
-      const groupDiv = document.createElement('div');
-      groupDiv.className = 'locket-month-group';
-      groupDiv.innerHTML = `
-        <h4 style="font-family:'Newsreader', serif; font-style:italic; font-size:1rem; color:var(--spiced-wine); margin-bottom:8px; border-bottom:1px dashed var(--olive-harvest); padding-bottom:4px;">${monthKey}</h4>
-        <div class="locket-grid" id="grid_${monthKey.replace(/\s+/g, '_')}"></div>
-      `;
-      locketCalendarContainer.appendChild(groupDiv);
-
-      const gridContent = groupDiv.querySelector('.locket-grid');
-      photosArr.forEach(({ item, index }) => {
-        const thumb = document.createElement('div');
-        thumb.className = 'locket-thumb';
-        thumb.innerHTML = `<img src="${item.url}" alt="Recuerdo">`;
-        thumb.addEventListener('click', () => {
-          toggleCarouselView.click();
-          currentPhotoSlideIndex = index;
-          updateSlidePosition();
-        });
-        gridContent.appendChild(thumb);
-      });
-    }
-  }
-
-  // RECORTE DE IMAGEN
+  // MANEJO DE MULTIMEDIA (FOTOS / VIDEOS)
   function inicializarCropper(file, aspectRatio = NaN) {
+    uploadedMediaBase64 = null;
+    
+    if (file && file.type.startsWith('video/')) {
+      uploadedMediaType = 'video';
+      if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadedMediaBase64 = e.target.result;
+        if (cropContainer) cropContainer.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    uploadedMediaType = 'image';
     if (cropperInstance) {
       cropperInstance.destroy();
       cropperInstance = null;
@@ -636,6 +726,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function obtenerImagenRecortadaBase64(maxWidth = 900) {
     return new Promise((resolve) => {
+      if (uploadedMediaType === 'video') {
+        resolve(uploadedMediaBase64);
+        return;
+      }
+
       if (!cropperInstance) { 
         resolve(null); 
         return; 
@@ -664,6 +759,8 @@ document.addEventListener('DOMContentLoaded', () => {
       cropperInstance.destroy();
       cropperInstance = null;
     }
+    uploadedMediaBase64 = null;
+    uploadedMediaType = 'image';
     if (cropContainer) cropContainer.classList.add('hidden');
     if (cropImagePreview) cropImagePreview.src = '';
     if (editBannerFileInput) editBannerFileInput.value = '';
@@ -690,7 +787,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editAboutFavoritesInput) editAboutFavoritesInput.value = (currentUser.about_favorites || []).join('\n');
         if (editAboutLinksInput) editAboutLinksInput.value = (currentUser.about_links || []).join('\n');
       } else if (seccionActualActiva === 'galeria') {
-        if (modalEditTitle) modalEditTitle.textContent = "Añadir Fotografía al Photo Corner";
+        if (modalEditTitle) modalEditTitle.textContent = "Añadir Foto o Video a la Galería";
         if (editFieldsGaleria) editFieldsGaleria.classList.remove('hidden');
         if (editGalleryPhotoTitle) editGalleryPhotoTitle.value = "";
         if (editGalleryPhotoStory) editGalleryPhotoStory.value = "";
@@ -765,10 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let payload = {};
       let updateItem = null;
 
-      let croppedBase64 = null;
-      if (cropperInstance) {
-        croppedBase64 = await obtenerImagenRecortadaBase64();
-      }
+      let croppedBase64 = await obtenerImagenRecortadaBase64();
 
       try {
         if (seccionActualActiva === 'sobre-mi') {
@@ -792,22 +886,30 @@ document.addEventListener('DOMContentLoaded', () => {
           currentUser.about_links = linksArray;
 
         } else if (seccionActualActiva === 'galeria') {
-          const photoTitle = (editGalleryPhotoTitle && editGalleryPhotoTitle.value.trim()) || "Nueva fotografía";
+          const photoTitle = (editGalleryPhotoTitle && editGalleryPhotoTitle.value.trim()) || "Nuevo recuerdo";
           const photoStory = (editGalleryPhotoStory && editGalleryPhotoStory.value.trim()) || "Recuerdo especial";
-          const imgUrl = croppedBase64;
+          const mediaUrl = croppedBase64;
 
-          if (!imgUrl) {
-            showModal('Imagen requerida', 'Por favor selecciona y ajusta una imagen para subir.');
+          if (!mediaUrl) {
+            showModal('Archivo requerido', 'Por favor selecciona una foto o video para subir.');
             return;
           }
 
-          photosStoriesList.push({ url: imgUrl, title: photoTitle, story: photoStory, date: new Date().toISOString() });
+          photosStoriesList.push({ 
+            url: mediaUrl, 
+            title: photoTitle, 
+            story: photoStory, 
+            type: uploadedMediaType, 
+            date: new Date().toISOString() 
+          });
+
           currentUser.photos_stories = photosStoriesList;
           payload.photos_stories = photosStoriesList;
           currentPhotoSlideIndex = photosStoriesList.length - 1;
           renderPhotosSlideshow();
+          renderLocketCalendar();
           
-          updateItem = { title: photoTitle, type: 'galeria', photoUrl: imgUrl, date: new Date().toISOString() };
+          updateItem = { title: photoTitle, type: 'galeria', photoUrl: mediaUrl, date: new Date().toISOString() };
 
         } else if (seccionActualActiva === 'reviews') {
           const revTitle = (editReviewTitle && editReviewTitle.value.trim()) || "Nueva Reseña";
@@ -824,6 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
           reviewsList.unshift({ url: imgUrl, title: revTitle, sub: revSub, sinopsis: revSinopsis, opinion: revOpinion, date: new Date().toISOString() });
           currentUser.reviews_list = reviewsList;
           payload.reviews_list = reviewsList;
+          poblarFiltroMesesReseñas();
           renderReviewsGrid();
 
           updateItem = { title: `Reseña: ${revTitle}`, type: 'reviews', date: new Date().toISOString() };
