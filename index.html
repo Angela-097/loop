@@ -439,7 +439,7 @@
           <a href="#" class="neo-link" data-seccion="sobre-mi">sobre mí</a>
           <a href="#" class="neo-link" data-seccion="galeria">galería</a>
           <a href="#" class="neo-link" data-seccion="reviews">reseñas</a>
-          <a href="#" class="neo-link" data-seccion="enlaces">enlaces</a>
+          <a href="#" class="neo-link" data-seccion="bitacora">bitácora</a>
         </nav>
 
         <div class="neo-sidebar-box">
@@ -566,14 +566,33 @@
             </div>
           </div>
 
-          <!-- PESTAÑA DE RESEÑAS / REVIEWS CON FILTRO DE PUNTILLISTO RETRO -->
+          <!-- PESTAÑA DE RESEÑAS / REVIEWS -->
           <div id="tab-reviews" class="tab-content hidden">
             <div class="reviews-wrapper-card">
               <div class="reviews-topbar">
                 <span class="reviews-tag-label">✦ DIARIO DE PELÍCULAS & LIBROS</span>
               </div>
               <div class="reviews-grid" id="reviewsGridContainer">
-                <!-- Se llenará dinámicamente con las tarjetas de reseñas -->
+                <!-- Se llenará dinámicamente -->
+              </div>
+            </div>
+          </div>
+
+          <!-- PESTAÑA DE BITÁCORA & MOODBOARD -->
+          <div id="tab-bitacora" class="tab-content hidden">
+            <div class="neo-card-box moodboard-banner-box" style="margin-bottom: 16px;">
+              <h3 style="border-bottom: none; margin-bottom: 4px;">✦ Vibras & Estación del Momento</h3>
+              <p id="moodboardQuoteDisplay" style="font-style: italic; font-size: 1.05rem; color: var(--spiced-wine); margin-bottom: 12px;"></p>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.8rem; font-family: 'Space Mono', monospace; color: var(--olive-harvest);">PALETA DEL MES:</span>
+                <div id="moodboardPaletteContainer" style="display: flex; gap: 6px;"></div>
+              </div>
+            </div>
+
+            <div class="neo-card-box">
+              <h3 style="margin-bottom: 12px;">Entradas del Diario</h3>
+              <div class="bitacora-posts-container" id="bitacoraPostsList">
+                <!-- Se llena dinámicamente con las entradas -->
               </div>
             </div>
           </div>
@@ -603,7 +622,7 @@
     </ul>
   </footer>
 
-  <!-- MODAL DE EDICIÓN CON HERRAMIENTA DE RECORTE (CROPPER) -->
+  <!-- MODAL DE EDICIÓN CON CROPPER -->
   <div id="editModal" class="modal-overlay hidden">
     <div class="clean-modal-box">
       <h3 id="modalEditTitle">Personalizar Mi Espacio</h3>
@@ -690,7 +709,6 @@
           </div>
         </div>
 
-        <!-- FORMULARIO DE RESEÑAS -->
         <div class="edit-fields-reviews hidden">
           <div class="form-group">
             <label for="editReviewFile">Poster / Foto del Libro o Película</label>
@@ -699,7 +717,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="editReviewTitle">Título & Año (Ej: Amélie (2001))</label>
+            <label for="editReviewTitle">Título & Año</label>
             <div class="input-line">
               <input type="text" id="editReviewTitle" placeholder="Ej: Portrait of a Lady on Fire (2019)">
             </div>
@@ -713,18 +731,48 @@
           <div class="form-group">
             <label for="editReviewSinopsis">Sinopsis</label>
             <div class="input-line" style="background: #fff; padding: 4px;">
-              <textarea id="editReviewSinopsis" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Corta sinopsis del film o libro..."></textarea>
+              <textarea id="editReviewSinopsis" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Corta sinopsis..."></textarea>
             </div>
           </div>
           <div class="form-group">
-            <label for="editReviewOpinión">Tu Opinión / Crítica</label>
+            <label for="editReviewOpinion">Tu Opinión / Crítica</label>
             <div class="input-line" style="background: #fff; padding: 4px;">
-              <textarea id="editReviewOpinion" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Escribe tus pensamientos sobre la película/libro..."></textarea>
+              <textarea id="editReviewOpinion" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Escribe tus pensamientos..."></textarea>
             </div>
           </div>
         </div>
 
-        <!-- Previsualización y Recorte de Imagen -->
+        <!-- FORMULARIO DE BITÁCORA & MOODBOARD -->
+        <div class="edit-fields-bitacora hidden">
+          <div class="form-group">
+            <label for="editMoodboardQuote">Frase / Poema del Momento</label>
+            <div class="input-line">
+              <input type="text" id="editMoodboardQuote" placeholder="Ej: Creando pequeñas cosas con gran significado.">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editMoodboardColors">Paleta de Colores (HEX separados por coma)</label>
+            <div class="input-line">
+              <input type="text" id="editMoodboardColors" placeholder="#743014, #84592B, #9D9167, #E8D1A7">
+            </div>
+          </div>
+          <hr style="border: none; border-top: 1px dashed var(--olive-harvest); margin: 10px 0;">
+          <h4 style="font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine); margin-bottom: 8px;">Nueva Entrada en Bitácora (Opcional)</h4>
+          <div class="form-group">
+            <label for="editBitacoraPostTitle">Título del Post / Pensamiento</label>
+            <div class="input-line">
+              <input type="text" id="editBitacoraPostTitle" placeholder="Ej: Reflexiones sobre diseño">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editBitacoraPostContent">Contenido del Post</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editBitacoraPostContent" rows="4" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Escribe tu entrada aquí..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Previsualización y Recorte -->
         <div id="cropContainer" class="crop-container hidden">
           <label style="font-size: 0.8rem; font-weight: bold; color: var(--spiced-wine); display: block; margin-bottom: 6px;">
             ✦ Ajusta y recorta tu imagen a tu gusto:

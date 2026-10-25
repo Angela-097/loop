@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabSobreMi = document.getElementById('tab-sobre-mi');
   const tabGaleria = document.getElementById('tab-galeria');
   const tabReviews = document.getElementById('tab-reviews');
+  const tabBitacora = document.getElementById('tab-bitacora');
   const headerSpotifyCard = document.getElementById('headerSpotifyCard');
 
   const toggleCarouselView = document.getElementById('toggleCarouselView');
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const editFieldsSobreMi = document.querySelector('.edit-fields-sobremi');
   const editFieldsGaleria = document.querySelector('.edit-fields-galeria');
   const editFieldsReviews = document.querySelector('.edit-fields-reviews');
+  const editFieldsBitacora = document.querySelector('.edit-fields-bitacora');
 
   const editBannerFileInput = document.getElementById('editBannerFile');
   const editHeaderTitleInput = document.getElementById('editHeaderTitle');
@@ -85,6 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const editReviewSinopsis = document.getElementById('editReviewSinopsis');
   const editReviewOpinion = document.getElementById('editReviewOpinion');
 
+  const editMoodboardQuoteInput = document.getElementById('editMoodboardQuote');
+  const editMoodboardColorsInput = document.getElementById('editMoodboardColors');
+  const editBitacoraPostTitleInput = document.getElementById('editBitacoraPostTitle');
+  const editBitacoraPostContentInput = document.getElementById('editBitacoraPostContent');
+
   const cancelEditBtn = document.getElementById('cancelEditBtn');
   const cropContainer = document.getElementById('cropContainer');
   const cropImagePreview = document.getElementById('cropImagePreview');
@@ -99,6 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const updatesList = document.getElementById('updatesList');
   const reviewsGridContainer = document.getElementById('reviewsGridContainer');
 
+  const moodboardQuoteDisplay = document.getElementById('moodboardQuoteDisplay');
+  const moodboardPaletteContainer = document.getElementById('moodboardPaletteContainer');
+  const bitacoraPostsList = document.getElementById('bitacoraPostsList');
+
   let currentUser = null;
   let cropperInstance = null;
   let seccionActualActiva = 'blog';
@@ -107,13 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let photosStoriesList = [];
   let updatesHistoryList = [];
   let reviewsList = [];
+  let bitacoraEntriesList = [];
 
   const seccionesInfo = {
     'blog': { titulo: 'HELLO', path: 'inicio' },
     'sobre-mi': { titulo: 'ABOUT ME', path: 'sobre mí' },
     'galeria': { titulo: 'GALLERY', path: 'galería' },
     'reviews': { titulo: 'REVIEWS', path: 'reseñas' },
-    'enlaces': { titulo: 'LINKS', path: 'enlaces' }
+    'bitacora': { titulo: 'BITÁCORA', path: 'bitácora & moodboard' }
   };
 
   botonesPill.forEach(btn => {
@@ -134,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tabSobreMi) tabSobreMi.classList.add('hidden');
       if (tabGaleria) tabGaleria.classList.add('hidden');
       if (tabReviews) tabReviews.classList.add('hidden');
+      if (tabBitacora) tabBitacora.classList.add('hidden');
 
       if (claveSeccion === 'blog') {
         if (tabBlog) tabBlog.classList.remove('hidden');
@@ -148,6 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tabReviews) tabReviews.classList.remove('hidden');
         if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
         renderReviewsGrid();
+      } else if (claveSeccion === 'bitacora') {
+        if (tabBitacora) tabBitacora.classList.remove('hidden');
+        if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+        renderBitacoraSection();
       }
     });
   });
@@ -291,6 +308,9 @@ document.addEventListener('DOMContentLoaded', () => {
     reviewsList = Array.isArray(currentUser.reviews_list) ? currentUser.reviews_list : [];
     renderReviewsGrid();
 
+    bitacoraEntriesList = Array.isArray(currentUser.bitacora_entries) ? currentUser.bitacora_entries : [];
+    renderBitacoraSection();
+
     actualizarReproductorSpotify(currentUser.spotify_url);
 
     if (dashTagsContainer) {
@@ -306,6 +326,65 @@ document.addEventListener('DOMContentLoaded', () => {
         dashTagsContainer.innerHTML = '<span class="tag-chip">#creatividad</span>';
       }
     }
+  }
+
+  function renderBitacoraSection() {
+    const moodboardData = currentUser.moodboard_data || { frase: "", paleta: [], imagenes: [] };
+
+    if (moodboardQuoteDisplay) {
+      moodboardQuoteDisplay.textContent = moodboardData.frase ? `"${moodboardData.frase}"` : '"Creando pequeñas cosas con gran significado."';
+    }
+
+    if (moodboardPaletteContainer) {
+      moodboardPaletteContainer.innerHTML = '';
+      const colors = (moodboardData.paleta && moodboardData.paleta.length > 0) ? moodboardData.paleta : ['#743014', '#84592B', '#9D9167', '#E8D1A7'];
+      colors.forEach(hex => {
+        const circle = document.createElement('div');
+        circle.className = 'palette-circle';
+        circle.style.backgroundColor = hex.trim();
+        circle.title = hex.trim();
+        moodboardPaletteContainer.appendChild(circle);
+      });
+    }
+
+    if (!bitacoraPostsList) return;
+    bitacoraPostsList.innerHTML = '';
+
+    if (bitacoraEntriesList.length === 0) {
+      bitacoraPostsList.innerHTML = `<p class="empty-note" style="text-align:center; padding:20px;">Aún no has escrito entradas en tu bitácora. Pulsa 'Editar espacio' para escribir tu primera nota.</p>`;
+      return;
+    }
+
+    bitacoraEntriesList.forEach((entry, index) => {
+      const card = document.createElement('div');
+      card.className = 'bitacora-post-card';
+      const dateObj = new Date(entry.date);
+      const formattedDate = dateObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      card.innerHTML = `
+        <button type="button" class="delete-post-btn" title="Eliminar entrada">✕</button>
+        <div class="bitacora-post-header">
+          <h4 class="bitacora-post-title">${entry.title}</h4>
+          <span class="bitacora-post-date">${formattedDate}</span>
+        </div>
+        <div class="bitacora-post-content">${entry.content}</div>
+      `;
+
+      const delBtn = card.querySelector('.delete-post-btn');
+      delBtn.addEventListener('click', async () => {
+        if (!confirm(`¿Eliminar la entrada "${entry.title}"?`)) return;
+        bitacoraEntriesList.splice(index, 1);
+        currentUser.bitacora_entries = bitacoraEntriesList;
+        renderBitacoraSection();
+
+        if (supabase && currentUser) {
+          await supabase.from('espacios').update({ bitacora_entries: bitacoraEntriesList }).eq('username', currentUser.username);
+        }
+        showModal('Eliminado', 'La entrada ha sido borrada.');
+      });
+
+      bitacoraPostsList.appendChild(card);
+    });
   }
 
   function renderReviewsGrid() {
@@ -391,6 +470,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (typeof updateObj === 'object' && updateObj.type === 'reviews') {
           const reviewsPill = document.querySelector('[data-seccion="reviews"]');
           if (reviewsPill) reviewsPill.click();
+        } else if (typeof updateObj === 'object' && updateObj.type === 'bitacora') {
+          const bitacoraPill = document.querySelector('[data-seccion="bitacora"]');
+          if (bitacoraPill) bitacoraPill.click();
         }
       });
 
@@ -554,15 +636,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function obtenerImagenRecortadaBase64(maxWidth = 900) {
     return new Promise((resolve) => {
-      if (!cropperInstance) { resolve(null); return; }
+      if (!cropperInstance) { 
+        resolve(null); 
+        return; 
+      }
 
-      const canvas = cropperInstance.getCroppedCanvas({
-        maxWidth: maxWidth,
-        imageSmoothingQuality: 'medium',
-      });
+      try {
+        const canvas = cropperInstance.getCroppedCanvas({
+          maxWidth: maxWidth,
+          imageSmoothingQuality: 'medium',
+        });
 
-      if (!canvas) { resolve(null); return; }
-      resolve(canvas.toDataURL('image/jpeg', 0.8));
+        if (!canvas) { 
+          resolve(null); 
+          return; 
+        }
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      } catch (err) {
+        console.warn("Error al recortar imagen:", err);
+        resolve(null);
+      }
     });
   }
 
@@ -588,6 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (editFieldsSobreMi) editFieldsSobreMi.classList.add('hidden');
       if (editFieldsGaleria) editFieldsGaleria.classList.add('hidden');
       if (editFieldsReviews) editFieldsReviews.classList.add('hidden');
+      if (editFieldsBitacora) editFieldsBitacora.classList.add('hidden');
 
       if (seccionActualActiva === 'sobre-mi') {
         if (modalEditTitle) modalEditTitle.textContent = "Personalizar Sección 'Sobre Mí'";
@@ -607,6 +701,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editReviewSub) editReviewSub.value = "";
         if (editReviewSinopsis) editReviewSinopsis.value = "";
         if (editReviewOpinion) editReviewOpinion.value = "";
+      } else if (seccionActualActiva === 'bitacora') {
+        if (modalEditTitle) modalEditTitle.textContent = "Personalizar Bitácora & Moodboard";
+        if (editFieldsBitacora) editFieldsBitacora.classList.remove('hidden');
+        
+        const currentMdata = currentUser.moodboard_data || { frase: "", paleta: [], imagenes: [] };
+        if (editMoodboardQuoteInput) editMoodboardQuoteInput.value = currentMdata.frase || "";
+        if (editMoodboardColorsInput) editMoodboardColorsInput.value = currentMdata.paleta ? currentMdata.paleta.join(', ') : "#743014, #84592B, #9D9167, #E8D1A7";
+        
+        if (editBitacoraPostTitleInput) editBitacoraPostTitleInput.value = "";
+        if (editBitacoraPostContentInput) editBitacoraPostContentInput.value = "";
       } else {
         if (modalEditTitle) modalEditTitle.textContent = "Personalizar Mi Espacio (Inicio)";
         if (editFieldsBlog) editFieldsBlog.classList.remove('hidden');
@@ -650,113 +754,158 @@ document.addEventListener('DOMContentLoaded', () => {
   if (editReviewFileInput) {
     editReviewFileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) inicializarCropper(file, 3 / 4); // Formato póster vertial clásico
+      if (file) inicializarCropper(file, 3 / 4);
     });
   }
 
   if (editForm) {
     editForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      
       let payload = {};
       let updateItem = null;
 
-      const croppedBase64 = await obtenerImagenRecortadaBase64();
-
-      if (seccionActualActiva === 'sobre-mi') {
-        const nuevaAboutBio = editAboutBioInput.value.trim();
-        const favsArray = editAboutFavoritesInput.value.trim() ? editAboutFavoritesInput.value.split('\n').map(f => f.trim()).filter(f => f) : [];
-        const linksArray = editAboutLinksInput.value.trim() ? editAboutLinksInput.value.split('\n').map(l => l.trim()).filter(l => l) : [];
-
-        payload.about_bio = nuevaAboutBio;
-        payload.about_favorites = favsArray;
-        payload.about_links = linksArray;
-
-        if (croppedBase64) {
-          payload.about_banner_url = croppedBase64;
-          currentUser.about_banner_url = croppedBase64;
-        }
-
-        currentUser.about_bio = nuevaAboutBio;
-        currentUser.about_favorites = favsArray;
-        currentUser.about_links = linksArray;
-
-      } else if (seccionActualActiva === 'galeria') {
-        const photoTitle = editGalleryPhotoTitle.value.trim() || "Nueva fotografía";
-        const photoStory = editGalleryPhotoStory.value.trim() || "Recuerdo especial";
-        const imgUrl = croppedBase64;
-
-        if (!imgUrl) {
-          showModal('Imagen requerida', 'Por favor selecciona y ajusta una imagen para subir.');
-          return;
-        }
-
-        photosStoriesList.push({ url: imgUrl, title: photoTitle, story: photoStory, date: new Date().toISOString() });
-        currentUser.photos_stories = photosStoriesList;
-        payload.photos_stories = photosStoriesList;
-        currentPhotoSlideIndex = photosStoriesList.length - 1;
-        renderPhotosSlideshow();
-        
-        updateItem = { title: photoTitle, type: 'galeria', photoUrl: imgUrl, date: new Date().toISOString() };
-
-      } else if (seccionActualActiva === 'reviews') {
-        const revTitle = editReviewTitle.value.trim() || "Nueva Reseña";
-        const revSub = editReviewSub.value.trim() || "";
-        const revSinopsis = editReviewSinopsis.value.trim() || "";
-        const revOpinion = editReviewOpinion.value.trim() || "";
-        const imgUrl = croppedBase64;
-
-        if (!imgUrl) {
-          showModal('Poster requerido', 'Por favor selecciona la foto del poster o portada.');
-          return;
-        }
-
-        reviewsList.unshift({ url: imgUrl, title: revTitle, sub: revSub, sinopsis: revSinopsis, opinion: revOpinion, date: new Date().toISOString() });
-        currentUser.reviews_list = reviewsList;
-        payload.reviews_list = reviewsList;
-        renderReviewsGrid();
-
-        updateItem = { title: `Reseña: ${revTitle}`, type: 'reviews', date: new Date().toISOString() };
-
-      } else {
-        const nuevoTitulo = editHeaderTitleInput.value.trim() || "HELLO";
-        const nuevaBio = editBioInput.value.trim();
-        const nuevasTagsStr = editTagsInput.value.trim();
-        const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
-        const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
-
-        payload = { header_title: nuevoTitulo, bio: nuevaBio, tags: tagsArray, spotify_url: nuevoSpotifyUrl };
-
-        if (croppedBase64) {
-          payload.banner_url = croppedBase64;
-          currentUser.banner_url = croppedBase64;
-        }
-
-        currentUser.header_title = nuevoTitulo;
-        currentUser.bio = nuevaBio;
-        currentUser.tags = tagsArray;
-        currentUser.spotify_url = nuevoSpotifyUrl;
+      let croppedBase64 = null;
+      if (cropperInstance) {
+        croppedBase64 = await obtenerImagenRecortadaBase64();
       }
 
-      if (updateItem) {
-        updatesHistoryList.unshift(updateItem);
-        if (updatesHistoryList.length > 5) updatesHistoryList.pop();
-        currentUser.updates_history = updatesHistoryList;
-        payload.updates_history = updatesHistoryList;
-        renderUpdatesList();
-      }
+      try {
+        if (seccionActualActiva === 'sobre-mi') {
+          const nuevaAboutBio = editAboutBioInput ? editAboutBioInput.value.trim() : "";
+          const favsArray = (editAboutFavoritesInput && editAboutFavoritesInput.value.trim()) 
+            ? editAboutFavoritesInput.value.split('\n').map(f => f.trim()).filter(f => f) : [];
+          const linksArray = (editAboutLinksInput && editAboutLinksInput.value.trim()) 
+            ? editAboutLinksInput.value.split('\n').map(l => l.trim()).filter(l => l) : [];
 
-      if (supabase && currentUser) {
-        const { error } = await supabase.from('espacios').update(payload).eq('username', currentUser.username);
-        if (error) {
-          showModal('Error', 'No se pudieron guardar los cambios en Supabase.');
-          return;
+          payload.about_bio = nuevaAboutBio;
+          payload.about_favorites = favsArray;
+          payload.about_links = linksArray;
+
+          if (croppedBase64) {
+            payload.about_banner_url = croppedBase64;
+            currentUser.about_banner_url = croppedBase64;
+          }
+
+          currentUser.about_bio = nuevaAboutBio;
+          currentUser.about_favorites = favsArray;
+          currentUser.about_links = linksArray;
+
+        } else if (seccionActualActiva === 'galeria') {
+          const photoTitle = (editGalleryPhotoTitle && editGalleryPhotoTitle.value.trim()) || "Nueva fotografía";
+          const photoStory = (editGalleryPhotoStory && editGalleryPhotoStory.value.trim()) || "Recuerdo especial";
+          const imgUrl = croppedBase64;
+
+          if (!imgUrl) {
+            showModal('Imagen requerida', 'Por favor selecciona y ajusta una imagen para subir.');
+            return;
+          }
+
+          photosStoriesList.push({ url: imgUrl, title: photoTitle, story: photoStory, date: new Date().toISOString() });
+          currentUser.photos_stories = photosStoriesList;
+          payload.photos_stories = photosStoriesList;
+          currentPhotoSlideIndex = photosStoriesList.length - 1;
+          renderPhotosSlideshow();
+          
+          updateItem = { title: photoTitle, type: 'galeria', photoUrl: imgUrl, date: new Date().toISOString() };
+
+        } else if (seccionActualActiva === 'reviews') {
+          const revTitle = (editReviewTitle && editReviewTitle.value.trim()) || "Nueva Reseña";
+          const revSub = editReviewSub ? editReviewSub.value.trim() : "";
+          const revSinopsis = editReviewSinopsis ? editReviewSinopsis.value.trim() : "";
+          const revOpinion = editReviewOpinion ? editReviewOpinion.value.trim() : "";
+          const imgUrl = croppedBase64;
+
+          if (!imgUrl) {
+            showModal('Poster requerido', 'Por favor selecciona la foto del poster o portada.');
+            return;
+          }
+
+          reviewsList.unshift({ url: imgUrl, title: revTitle, sub: revSub, sinopsis: revSinopsis, opinion: revOpinion, date: new Date().toISOString() });
+          currentUser.reviews_list = reviewsList;
+          payload.reviews_list = reviewsList;
+          renderReviewsGrid();
+
+          updateItem = { title: `Reseña: ${revTitle}`, type: 'reviews', date: new Date().toISOString() };
+
+        } else if (seccionActualActiva === 'bitacora') {
+          const quoteVal = editMoodboardQuoteInput ? editMoodboardQuoteInput.value.trim() : "";
+          const colorsValStr = editMoodboardColorsInput ? editMoodboardColorsInput.value.trim() : "";
+          const postTitle = editBitacoraPostTitleInput ? editBitacoraPostTitleInput.value.trim() : "";
+          const postContent = editBitacoraPostContentInput ? editBitacoraPostContentInput.value.trim() : "";
+
+          const colorsArr = colorsValStr ? colorsValStr.split(',').map(c => c.trim()) : [];
+
+          const newMoodboardData = {
+            frase: quoteVal,
+            paleta: colorsArr,
+            imagenes: currentUser.moodboard_data?.imagenes || []
+          };
+
+          currentUser.moodboard_data = newMoodboardData;
+          payload.moodboard_data = newMoodboardData;
+
+          if (postTitle && postContent) {
+            bitacoraEntriesList.unshift({
+              title: postTitle,
+              content: postContent,
+              date: new Date().toISOString()
+            });
+            currentUser.bitacora_entries = bitacoraEntriesList;
+            payload.bitacora_entries = bitacoraEntriesList;
+
+            updateItem = { title: `Nota: ${postTitle}`, type: 'bitacora', date: new Date().toISOString() };
+          }
+
+          renderBitacoraSection();
+
+        } else {
+          const nuevoTitulo = (editHeaderTitleInput && editHeaderTitleInput.value.trim()) || "HELLO";
+          const nuevaBio = editBioInput ? editBioInput.value.trim() : "";
+          const nuevasTagsStr = editTagsInput ? editTagsInput.value.trim() : "";
+          const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
+          const tagsArray = nuevasTagsStr ? nuevasTagsStr.split(',').map(t => t.trim()) : [];
+
+          payload = { header_title: nuevoTitulo, bio: nuevaBio, tags: tagsArray, spotify_url: nuevoSpotifyUrl };
+
+          if (croppedBase64) {
+            payload.banner_url = croppedBase64;
+            currentUser.banner_url = croppedBase64;
+          }
+
+          currentUser.header_title = nuevoTitulo;
+          currentUser.bio = nuevaBio;
+          currentUser.tags = tagsArray;
+          currentUser.spotify_url = nuevoSpotifyUrl;
         }
-      }
 
-      renderDashboard();
-      limpiarCropper();
-      if (editModal) editModal.classList.add('hidden');
-      showModal('¡Actualizado!', 'Los cambios se han guardado con éxito.');
+        if (updateItem) {
+          updatesHistoryList.unshift(updateItem);
+          if (updatesHistoryList.length > 5) updatesHistoryList.pop();
+          currentUser.updates_history = updatesHistoryList;
+          payload.updates_history = updatesHistoryList;
+          renderUpdatesList();
+        }
+
+        if (supabase && currentUser) {
+          const { error } = await supabase.from('espacios').update(payload).eq('username', currentUser.username);
+          if (error) {
+            console.error("Error al actualizar en Supabase:", error);
+            showModal('Error', 'No se pudieron guardar algunos cambios en Supabase.');
+          }
+        }
+
+        renderDashboard();
+        limpiarCropper();
+        if (editModal) editModal.classList.add('hidden');
+        showModal('¡Actualizado!', 'Los cambios se han guardado con éxito.');
+
+      } catch (err) {
+        console.error("Error durante el guardado:", err);
+        limpiarCropper();
+        if (editModal) editModal.classList.add('hidden');
+        showModal('Aviso', 'Se guardaron los cambios locales.');
+      }
     });
   }
 
@@ -821,7 +970,9 @@ document.addEventListener('DOMContentLoaded', () => {
             spotify_url: '', 
             photos_stories: [], 
             updates_history: [],
-            reviews_list: []
+            reviews_list: [],
+            bitacora_entries: [],
+            moodboard_data: { frase: "", paleta: ["#743014", "#84592B", "#9D9167", "#E8D1A7"], imagenes: [] }
           }]);
 
           if (dbError) { 
@@ -831,7 +982,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      currentUser = { username, email, tags: tagsArray, header_title: 'HELLO', bio: '', banner_url: '', spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [] };
+      currentUser = { 
+        username, 
+        email, 
+        tags: tagsArray, 
+        header_title: 'HELLO', 
+        bio: '', 
+        banner_url: '', 
+        spotify_url: '', 
+        photos_stories: [], 
+        updates_history: [], 
+        reviews_list: [], 
+        bitacora_entries: [], 
+        moodboard_data: { frase: "", paleta: ["#743014", "#84592B", "#9D9167", "#E8D1A7"], imagenes: [] } 
+      };
       
       showModal(
         '¡Espacio Creado con Éxito!', 
@@ -854,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (error) { showModal('Credenciales incorrectas', 'Contraseña no válida.'); return; }
         currentUser = perfil;
       } else {
-        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [] };
+        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [], bitacora_entries: [], moodboard_data: { frase: "", paleta: [], imagenes: [] } };
       }
       
       showModal('¡Bienvenido de nuevo!', `Lo que estás a punto de probar es solo un prototipo, se está preparando la versión final, espero les guste.\n\nAccediendo a: ${currentUser.username}.loop.org...`, () => { switchView('dashboard'); });

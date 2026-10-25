@@ -1443,9 +1443,7 @@ body {
   text-decoration: underline;
 }
 
-/* =========================================
-   ESTILOS DE LA SECCIÓN DE RESEÑAS / REVIEWS
-   ========================================= */
+/* RESEÑAS / REVIEWS */
 .reviews-wrapper-card {
   background: #fdfbf7;
   border: 1px solid var(--olive-harvest);
@@ -1484,7 +1482,6 @@ body {
   box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
 }
 
-/* CONTENEDOR DE LA IMAGEN CON EL FILTRO DE PUNTILLISMO RETRO (DITHER) */
 .review-poster-box {
   width: 100%;
   height: 200px;
@@ -1504,7 +1501,6 @@ body {
   filter: contrast(115%) brightness(95%) sepia(20%);
 }
 
-/* Capa de textura de puntos estilo halftoning/dithering vintage */
 .review-poster-box::after {
   content: "";
   position: absolute;
@@ -1543,26 +1539,6 @@ body {
   color: var(--cowhide-cocoa);
 }
 
-.review-body-scroll::-webkit-scrollbar {
-  width: 4px;
-}
-.review-body-scroll::-webkit-scrollbar-thumb {
-  background: var(--olive-harvest);
-  border-radius: 2px;
-}
-
-.review-body-scroll p.sinopsis-text {
-  font-style: italic;
-  opacity: 0.9;
-  margin-bottom: 8px;
-  border-bottom: 1px dashed var(--olive-harvest);
-  padding-bottom: 6px;
-}
-
-.review-body-scroll p.opinion-text {
-  font-family: 'Outfit', sans-serif;
-}
-
 .delete-review-btn {
   position: absolute;
   top: 6px;
@@ -1579,6 +1555,159 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* =========================================
+   ESTILOS DE BITÁCORA & MOODBOARD
+   ========================================= */
+.bitacora-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.moodboard-card {
+  background: #faf6f0;
+}
+
+.moodboard-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed var(--olive-harvest);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.moodboard-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: bold;
+  color: var(--spiced-wine);
+}
+
+.palette-swatches-row {
+  display: flex;
+  gap: 6px;
+}
+
+.color-swatch-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--olive-harvest);
+  box-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+.moodboard-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 16px;
+  align-items: center;
+}
+
+@media(max-width: 650px) {
+  .moodboard-grid-layout { grid-template-columns: 1fr; }
+}
+
+.moodboard-quote-box {
+  background: #fdfbf7;
+  border: 1px solid var(--olive-harvest);
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.04);
+}
+
+.moodboard-quote-text {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--spiced-wine);
+}
+
+.moodboard-collage-box {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.mood-collage-img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--olive-harvest);
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+}
+
+/* ENTRADAS DEL DIARIO */
+.bitacora-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bitacora-post-item {
+  background: #faf6f0;
+  border: 1px solid var(--olive-harvest);
+  border-radius: 6px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.04);
+}
+
+.bitacora-post-header {
+  border-bottom: 1px dashed var(--olive-harvest);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bitacora-post-title {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--spiced-wine);
+  font-weight: 600;
+}
+
+.bitacora-post-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--olive-harvest);
+}
+
+.bitacora-post-body {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--cowhide-cocoa);
+  white-space: pre-line;
+}
+
+.delete-post-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--spiced-wine);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  opacity: 0.6;
+}
+
+.delete-post-btn:hover {
+  opacity: 1;
 }
 
 .gallery-main-card {
@@ -1788,4 +1917,21 @@ body {
 body:has(#dashboardView:not(.hidden)) .top-bar,
 body:has(#dashboardView:not(.hidden)) .footer {
   display: none !important;
+}
+#moodboardPaletteContainer {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.palette-circle {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--olive-harvest, #84592B) !important;
+  display: inline-block !important;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.2) !important;
 }
