@@ -21,9 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const quickLoginBtn = document.getElementById('quickLoginBtn');
   const brandNav = document.getElementById('brandNav');
   const logoutBtn = document.getElementById('logoutBtn');
-  const navGuestLinks = document.getElementById('navGuestLinks');
-  const navGuestLogin = document.getElementById('navGuestLogin');
-  const navUserLogout = document.getElementById('navUserLogout');
 
   const selectPlanBtns = document.querySelectorAll('.select-plan-btn');
   const donateCoffeeBtn = document.getElementById('donateCoffeeBtn');
@@ -43,11 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashEditBtn = document.getElementById('dashEditBtn');
   
   const seccionTitulo = document.getElementById('seccion-titulo');
-  const seccionSubtitulo = document.getElementById('seccion-subtitulo');
-  const botonesPill = document.querySelectorAll('.pill-btn');
+  const currentPathText = document.getElementById('currentPathText');
+  const homeBreadcrumb = document.getElementById('homeBreadcrumb');
+  const botonesPill = document.querySelectorAll('.neo-link');
   const tabBlog = document.getElementById('tab-blog');
   const tabSobreMi = document.getElementById('tab-sobre-mi');
   const tabGaleria = document.getElementById('tab-galeria');
+  const tabReviews = document.getElementById('tab-reviews');
   const headerSpotifyCard = document.getElementById('headerSpotifyCard');
 
   const toggleCarouselView = document.getElementById('toggleCarouselView');
@@ -63,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const editFieldsBlog = document.querySelector('.edit-fields-blog');
   const editFieldsSobreMi = document.querySelector('.edit-fields-sobremi');
   const editFieldsGaleria = document.querySelector('.edit-fields-galeria');
+  const editFieldsReviews = document.querySelector('.edit-fields-reviews');
 
   const editBannerFileInput = document.getElementById('editBannerFile');
   const editHeaderTitleInput = document.getElementById('editHeaderTitle');
@@ -78,7 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const editGalleryFileInput = document.getElementById('editGalleryFile');
   const editGalleryPhotoTitle = document.getElementById('editGalleryPhotoTitle');
   const editGalleryPhotoStory = document.getElementById('editGalleryPhotoStory');
+
+  const editReviewFileInput = document.getElementById('editReviewFile');
+  const editReviewTitle = document.getElementById('editReviewTitle');
+  const editReviewSub = document.getElementById('editReviewSub');
+  const editReviewSinopsis = document.getElementById('editReviewSinopsis');
+  const editReviewOpinion = document.getElementById('editReviewOpinion');
+
   const cancelEditBtn = document.getElementById('cancelEditBtn');
+  const cropContainer = document.getElementById('cropContainer');
+  const cropImagePreview = document.getElementById('cropImagePreview');
 
   const bannerImg = document.getElementById('bannerImg');
   const aboutBannerImg = document.getElementById('aboutBannerImg');
@@ -88,23 +97,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const aboutLinksList = document.getElementById('aboutLinksList');
   const spotifyWidgetFrame = document.getElementById('spotifyWidgetFrame');
   const updatesList = document.getElementById('updatesList');
+  const reviewsGridContainer = document.getElementById('reviewsGridContainer');
 
   let currentUser = null;
-  let tempBannerBase64 = null;
-  let tempAboutBannerBase64 = null;
-  let tempGalleryBase64 = null;
+  let cropperInstance = null;
   let seccionActualActiva = 'blog';
 
   let currentPhotoSlideIndex = 0;
   let photosStoriesList = [];
   let updatesHistoryList = [];
+  let reviewsList = [];
 
   const seccionesInfo = {
-    'blog': { titulo: 'Inicio / Blog', subtitulo: 'archivo cronologico // estado: activo' },
-    'sobre-mi': { titulo: 'Sobre mi', subtitulo: 'perfil del autor // notas personales' },
-    'galeria': { titulo: 'Galeria', subtitulo: 'historias fotograficas // photo corner' },
-    'visitas': { titulo: 'Libro de Visitas', subtitulo: 'mensajes de la comunidad // firmar' },
-    'enlaces': { titulo: 'Enlaces', subtitulo: 'rincones recomendados de la web' }
+    'blog': { titulo: 'HELLO', path: 'inicio' },
+    'sobre-mi': { titulo: 'ABOUT ME', path: 'sobre mí' },
+    'galeria': { titulo: 'GALLERY', path: 'galería' },
+    'reviews': { titulo: 'REVIEWS', path: 'reseñas' },
+    'enlaces': { titulo: 'LINKS', path: 'enlaces' }
   };
 
   botonesPill.forEach(btn => {
@@ -116,14 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const claveSeccion = btn.getAttribute('data-seccion');
       seccionActualActiva = claveSeccion;
 
-      if (seccionesInfo[claveSeccion] && seccionTitulo && seccionSubtitulo) {
-        seccionTitulo.textContent = seccionesInfo[claveSeccion].titulo;
-        seccionSubtitulo.textContent = seccionesInfo[claveSeccion].subtitulo;
+      if (seccionesInfo[claveSeccion]) {
+        if (seccionTitulo) seccionTitulo.textContent = seccionesInfo[claveSeccion].titulo;
+        if (currentPathText) currentPathText.textContent = seccionesInfo[claveSeccion].path;
       }
 
       if (tabBlog) tabBlog.classList.add('hidden');
       if (tabSobreMi) tabSobreMi.classList.add('hidden');
       if (tabGaleria) tabGaleria.classList.add('hidden');
+      if (tabReviews) tabReviews.classList.add('hidden');
 
       if (claveSeccion === 'blog') {
         if (tabBlog) tabBlog.classList.remove('hidden');
@@ -134,9 +144,21 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (claveSeccion === 'galeria') {
         if (tabGaleria) tabGaleria.classList.remove('hidden');
         if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+      } else if (claveSeccion === 'reviews') {
+        if (tabReviews) tabReviews.classList.remove('hidden');
+        if (headerSpotifyCard) headerSpotifyCard.classList.add('hidden');
+        renderReviewsGrid();
       }
     });
   });
+
+  if (homeBreadcrumb) {
+    homeBreadcrumb.addEventListener('click', (e) => {
+      e.preventDefault();
+      const firstPill = document.querySelector('[data-seccion="blog"]');
+      if (firstPill) firstPill.click();
+    });
+  }
 
   if (toggleCarouselView && toggleCalendarView) {
     toggleCarouselView.addEventListener('click', () => {
@@ -149,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toggleCalendarView.classList.add('active');
       toggleCarouselView.classList.remove('active');
       photosCalendarViewMode.classList.remove('hidden');
-      photosCarouselViewMode.classList.add('hidden');
+      photosCalendarViewMode.classList.add('hidden');
       renderLocketCalendar();
     });
   }
@@ -205,18 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function updateNavState() {
-    if (currentUser) {
-      if (navGuestLinks) navGuestLinks.classList.add('hidden');
-      if (navGuestLogin) navGuestLogin.classList.add('hidden');
-      if (navUserLogout) navUserLogout.classList.remove('hidden');
-    } else {
-      if (navGuestLinks) navGuestLinks.classList.remove('hidden');
-      if (navGuestLogin) navGuestLogin.classList.remove('hidden');
-      if (navUserLogout) navUserLogout.classList.add('hidden');
-    }
-  }
-
   function actualizarReproductorSpotify(url) {
     if (!spotifyWidgetFrame) return;
     let embedUrl = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0";
@@ -237,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (dashUsernameText) dashUsernameText.textContent = currentUser.username;
     if (dashUrlText) dashUrlText.textContent = `${currentUser.username}.loop.org`;
-    if (seccionTitulo) seccionTitulo.textContent = currentUser.header_title || "¡HOLA!";
+    if (seccionTitulo) seccionTitulo.textContent = currentUser.header_title || "HELLO";
     if (nowStatusText) nowStatusText.textContent = `"${currentUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio."}"`;
 
     if (bannerImg) {
@@ -256,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
       favs.forEach(item => {
         const li = document.createElement('li');
         const parts = item.split(':');
-        li.innerHTML = parts.length > 1 ? `<span class="star-icon">✶</span> <strong>${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}` : `<span class="star-icon">✶</span> ${item}`;
+        li.innerHTML = parts.length > 1 ? `<span style="color:var(--toasted-caramel);">✶</span> <strong>${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}` : `<span style="color:var(--toasted-caramel);">✶</span> ${item}`;
         aboutFavoritesList.appendChild(li);
       });
     }
@@ -267,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
       links.forEach(item => {
         const li = document.createElement('li');
         const parts = item.split(':');
-        li.innerHTML = parts.length > 1 ? `<span class="star-icon">✶</span> <a href="${parts.slice(1).join(':').trim()}" target="_blank" class="about-link">${parts[0].trim()}</a>` : `<span class="star-icon">✶</span> <a href="#" class="about-link">${item.trim()}</a>`;
+        li.innerHTML = parts.length > 1 ? `<span style="color:var(--toasted-caramel);">✶</span> <a href="${parts.slice(1).join(':').trim()}" target="_blank" style="color:var(--spiced-wine);">${parts[0].trim()}</a>` : `<span style="color:var(--toasted-caramel);">✶</span> ${item.trim()}`;
         aboutLinksList.appendChild(li);
       });
     }
@@ -277,6 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updatesHistoryList = Array.isArray(currentUser.updates_history) ? currentUser.updates_history : [];
     renderUpdatesList();
+
+    reviewsList = Array.isArray(currentUser.reviews_list) ? currentUser.reviews_list : [];
+    renderReviewsGrid();
 
     actualizarReproductorSpotify(currentUser.spotify_url);
 
@@ -295,12 +308,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function renderReviewsGrid() {
+    if (!reviewsGridContainer) return;
+    reviewsGridContainer.innerHTML = '';
+
+    if (reviewsList.length === 0) {
+      reviewsGridContainer.innerHTML = `<p class="empty-note" style="grid-column: 1/-1; padding: 20px; text-align: center;">Aún no has agregado reseñas. Presiona 'Editar espacio' para publicar tu primer ranking de película o libro.</p>`;
+      return;
+    }
+
+    reviewsList.forEach((rev, index) => {
+      const card = document.createElement('div');
+      card.className = 'review-card-item';
+      card.innerHTML = `
+        <button type="button" class="delete-review-btn" title="Eliminar reseña">✕</button>
+        <div class="review-poster-box">
+          <img src="${rev.url}" alt="${rev.title}">
+        </div>
+        <h4 class="review-title">${rev.title}</h4>
+        <div class="review-sub">${rev.sub || ''}</div>
+        <div class="review-body-scroll">
+          ${rev.sinopsis ? `<p class="sinopsis-text">${rev.sinopsis}</p>` : ''}
+          <p class="opinion-text">${rev.opinion || ''}</p>
+        </div>
+      `;
+
+      const delBtn = card.querySelector('.delete-review-btn');
+      delBtn.addEventListener('click', async () => {
+        if (!confirm(`¿Eliminar la reseña de "${rev.title}"?`)) return;
+        reviewsList.splice(index, 1);
+        currentUser.reviews_list = reviewsList;
+        renderReviewsGrid();
+
+        if (supabase && currentUser) {
+          await supabase.from('espacios').update({ reviews_list: reviewsList }).eq('username', currentUser.username);
+        }
+        showModal('Eliminado', 'La reseña ha sido borrada.');
+      });
+
+      reviewsGridContainer.appendChild(card);
+    });
+  }
+
   function renderUpdatesList() {
     if (!updatesList) return;
     updatesList.innerHTML = '';
 
     if (updatesHistoryList.length === 0) {
-      updatesList.innerHTML = `<p style="opacity: 0.7; font-style: italic; font-size: 0.85rem;">Sin actualizaciones recientes.</p>`;
+      updatesList.innerHTML = `<p class="empty-note">Sin actualizaciones recientes.</p>`;
       return;
     }
 
@@ -333,6 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPhotoSlideIndex = targetIndex;
             updateSlidePosition();
           }
+        } else if (typeof updateObj === 'object' && updateObj.type === 'reviews') {
+          const reviewsPill = document.querySelector('[data-seccion="reviews"]');
+          if (reviewsPill) reviewsPill.click();
         }
       });
 
@@ -452,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const groupDiv = document.createElement('div');
       groupDiv.className = 'locket-month-group';
       groupDiv.innerHTML = `
-        <h4>${monthKey}</h4>
+        <h4 style="font-family:'Newsreader', serif; font-style:italic; font-size:1rem; color:var(--spiced-wine); margin-bottom:8px; border-bottom:1px dashed var(--olive-harvest); padding-bottom:4px;">${monthKey}</h4>
         <div class="locket-grid" id="grid_${monthKey.replace(/\s+/g, '_')}"></div>
       `;
       locketCalendarContainer.appendChild(groupDiv);
@@ -472,43 +530,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function comprimirImagen(file, maxWidth = 800, quality = 0.7) {
+  // RECORTE DE IMAGEN
+  function inicializarCropper(file, aspectRatio = NaN) {
+    if (cropperInstance) {
+      cropperInstance.destroy();
+      cropperInstance = null;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      cropImagePreview.src = e.target.result;
+      cropContainer.classList.remove('hidden');
+
+      cropperInstance = new Cropper(cropImagePreview, {
+        aspectRatio: aspectRatio,
+        viewMode: 1,
+        autoCropArea: 0.9,
+        background: false,
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function obtenerImagenRecortadaBase64(maxWidth = 900) {
     return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
+      if (!cropperInstance) { resolve(null); return; }
 
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
+      const canvas = cropperInstance.getCroppedCanvas({
+        maxWidth: maxWidth,
+        imageSmoothingQuality: 'medium',
+      });
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      if (!canvas) { resolve(null); return; }
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
     });
+  }
+
+  function limpiarCropper() {
+    if (cropperInstance) {
+      cropperInstance.destroy();
+      cropperInstance = null;
+    }
+    if (cropContainer) cropContainer.classList.add('hidden');
+    if (cropImagePreview) cropImagePreview.src = '';
+    if (editBannerFileInput) editBannerFileInput.value = '';
+    if (editAboutBannerFileInput) editAboutBannerFileInput.value = '';
+    if (editGalleryFileInput) editGalleryFileInput.value = '';
+    if (editReviewFileInput) editReviewFileInput.value = '';
   }
 
   if (dashEditBtn) {
     dashEditBtn.addEventListener('click', () => {
       if (!currentUser) return;
-      tempBannerBase64 = null;
-      tempAboutBannerBase64 = null;
-      tempGalleryBase64 = null;
+      limpiarCropper();
 
       if (editFieldsBlog) editFieldsBlog.classList.add('hidden');
       if (editFieldsSobreMi) editFieldsSobreMi.classList.add('hidden');
       if (editFieldsGaleria) editFieldsGaleria.classList.add('hidden');
+      if (editFieldsReviews) editFieldsReviews.classList.add('hidden');
 
       if (seccionActualActiva === 'sobre-mi') {
         if (modalEditTitle) modalEditTitle.textContent = "Personalizar Sección 'Sobre Mí'";
@@ -521,10 +600,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editFieldsGaleria) editFieldsGaleria.classList.remove('hidden');
         if (editGalleryPhotoTitle) editGalleryPhotoTitle.value = "";
         if (editGalleryPhotoStory) editGalleryPhotoStory.value = "";
+      } else if (seccionActualActiva === 'reviews') {
+        if (modalEditTitle) modalEditTitle.textContent = "Añadir Reseña (Película o Libro)";
+        if (editFieldsReviews) editFieldsReviews.classList.remove('hidden');
+        if (editReviewTitle) editReviewTitle.value = "";
+        if (editReviewSub) editReviewSub.value = "";
+        if (editReviewSinopsis) editReviewSinopsis.value = "";
+        if (editReviewOpinion) editReviewOpinion.value = "";
       } else {
         if (modalEditTitle) modalEditTitle.textContent = "Personalizar Mi Espacio (Inicio)";
         if (editFieldsBlog) editFieldsBlog.classList.remove('hidden');
-        if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || "¡HOLA!";
+        if (editHeaderTitleInput) editHeaderTitleInput.value = currentUser.header_title || "HELLO";
         if (editBioInput) editBioInput.value = currentUser.bio || "";
         if (editTagsInput) editTagsInput.value = currentUser.tags ? currentUser.tags.join(', ') : '';
         if (editSpotifyUrlInput) editSpotifyUrlInput.value = currentUser.spotify_url || "";
@@ -534,27 +620,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (cancelEditBtn) {
-    cancelEditBtn.addEventListener('click', () => { if (editModal) editModal.classList.add('hidden'); });
+    cancelEditBtn.addEventListener('click', () => {
+      limpiarCropper();
+      if (editModal) editModal.classList.add('hidden');
+    });
   }
 
   if (editBannerFileInput) {
-    editBannerFileInput.addEventListener('change', async (e) => {
+    editBannerFileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) tempBannerBase64 = await comprimirImagen(file, 900, 0.75);
+      if (file) inicializarCropper(file, 16 / 7);
     });
   }
 
   if (editAboutBannerFileInput) {
-    editAboutBannerFileInput.addEventListener('change', async (e) => {
+    editAboutBannerFileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) tempAboutBannerBase64 = await comprimirImagen(file, 900, 0.75);
+      if (file) inicializarCropper(file, 16 / 6);
     });
   }
 
   if (editGalleryFileInput) {
-    editGalleryFileInput.addEventListener('change', async (e) => {
+    editGalleryFileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) tempGalleryBase64 = await comprimirImagen(file, 800, 0.7);
+      if (file) inicializarCropper(file, NaN);
+    });
+  }
+
+  if (editReviewFileInput) {
+    editReviewFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) inicializarCropper(file, 3 / 4); // Formato póster vertial clásico
     });
   }
 
@@ -563,6 +659,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       let payload = {};
       let updateItem = null;
+
+      const croppedBase64 = await obtenerImagenRecortadaBase64();
 
       if (seccionActualActiva === 'sobre-mi') {
         const nuevaAboutBio = editAboutBioInput.value.trim();
@@ -573,9 +671,9 @@ document.addEventListener('DOMContentLoaded', () => {
         payload.about_favorites = favsArray;
         payload.about_links = linksArray;
 
-        if (tempAboutBannerBase64) {
-          payload.about_banner_url = tempAboutBannerBase64;
-          currentUser.about_banner_url = tempAboutBannerBase64;
+        if (croppedBase64) {
+          payload.about_banner_url = croppedBase64;
+          currentUser.about_banner_url = croppedBase64;
         }
 
         currentUser.about_bio = nuevaAboutBio;
@@ -585,10 +683,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (seccionActualActiva === 'galeria') {
         const photoTitle = editGalleryPhotoTitle.value.trim() || "Nueva fotografía";
         const photoStory = editGalleryPhotoStory.value.trim() || "Recuerdo especial";
-        const imgUrl = tempGalleryBase64;
+        const imgUrl = croppedBase64;
 
         if (!imgUrl) {
-          showModal('Imagen requerida', 'Por favor selecciona un archivo de imagen para subir.');
+          showModal('Imagen requerida', 'Por favor selecciona y ajusta una imagen para subir.');
           return;
         }
 
@@ -600,8 +698,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateItem = { title: photoTitle, type: 'galeria', photoUrl: imgUrl, date: new Date().toISOString() };
 
+      } else if (seccionActualActiva === 'reviews') {
+        const revTitle = editReviewTitle.value.trim() || "Nueva Reseña";
+        const revSub = editReviewSub.value.trim() || "";
+        const revSinopsis = editReviewSinopsis.value.trim() || "";
+        const revOpinion = editReviewOpinion.value.trim() || "";
+        const imgUrl = croppedBase64;
+
+        if (!imgUrl) {
+          showModal('Poster requerido', 'Por favor selecciona la foto del poster o portada.');
+          return;
+        }
+
+        reviewsList.unshift({ url: imgUrl, title: revTitle, sub: revSub, sinopsis: revSinopsis, opinion: revOpinion, date: new Date().toISOString() });
+        currentUser.reviews_list = reviewsList;
+        payload.reviews_list = reviewsList;
+        renderReviewsGrid();
+
+        updateItem = { title: `Reseña: ${revTitle}`, type: 'reviews', date: new Date().toISOString() };
+
       } else {
-        const nuevoTitulo = editHeaderTitleInput.value.trim() || "¡HOLA!";
+        const nuevoTitulo = editHeaderTitleInput.value.trim() || "HELLO";
         const nuevaBio = editBioInput.value.trim();
         const nuevasTagsStr = editTagsInput.value.trim();
         const nuevoSpotifyUrl = editSpotifyUrlInput ? editSpotifyUrlInput.value.trim() : "";
@@ -609,9 +726,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         payload = { header_title: nuevoTitulo, bio: nuevaBio, tags: tagsArray, spotify_url: nuevoSpotifyUrl };
 
-        if (tempBannerBase64) {
-          payload.banner_url = tempBannerBase64;
-          currentUser.banner_url = tempBannerBase64;
+        if (croppedBase64) {
+          payload.banner_url = croppedBase64;
+          currentUser.banner_url = croppedBase64;
         }
 
         currentUser.header_title = nuevoTitulo;
@@ -637,8 +754,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       renderDashboard();
+      limpiarCropper();
       if (editModal) editModal.classList.add('hidden');
-      showModal('¡Actualizado!', 'Los cambios se han guardado con éxito en la nube.');
+      showModal('¡Actualizado!', 'Los cambios se han guardado con éxito.');
     });
   }
 
@@ -702,7 +820,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tags: tagsArray, 
             spotify_url: '', 
             photos_stories: [], 
-            updates_history: [] 
+            updates_history: [],
+            reviews_list: []
           }]);
 
           if (dbError) { 
@@ -712,8 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      currentUser = { username, email, tags: tagsArray, header_title: '¡HOLA!', bio: '', banner_url: '', spotify_url: '', photos_stories: [], updates_history: [] };
-      updateNavState();
+      currentUser = { username, email, tags: tagsArray, header_title: 'HELLO', bio: '', banner_url: '', spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [] };
       
       showModal(
         '¡Espacio Creado con Éxito!', 
@@ -736,10 +854,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (error) { showModal('Credenciales incorrectas', 'Contraseña no válida.'); return; }
         currentUser = perfil;
       } else {
-        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [] };
+        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [] };
       }
-
-      updateNavState();
       
       showModal('¡Bienvenido de nuevo!', `Lo que estás a punto de probar es solo un prototipo, se está preparando la versión final, espero les guste.\n\nAccediendo a: ${currentUser.username}.loop.org...`, () => { switchView('dashboard'); });
     });
@@ -749,7 +865,6 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', async () => {
       if (supabase) await supabase.auth.signOut();
       currentUser = null;
-      updateNavState();
       showModal('Sesión Cerrada', 'Has salido de tu cuenta.', () => { switchView('landing'); });
     });
   }
@@ -761,7 +876,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data: perfil } = await supabase.from('espacios').select('*').eq('id', session.user.id).single();
         if (perfil) {
           currentUser = perfil;
-          updateNavState();
           switchView('dashboard');
           return;
         }

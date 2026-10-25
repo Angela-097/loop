@@ -9,11 +9,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
+  <!-- Cropper.js CSS para el recortador de imágenes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
+  <!-- ENCABEZADO GLOBAL -->
   <header class="top-bar">
     <div class="brand" id="brandNav">
       <span class="brand-name">loop</span>
@@ -27,22 +29,15 @@
         <li><a href="#faq"><span class="nav-icon">✧</span> Duda</a></li>
         <li id="navGuestLogin"><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
         <li id="navGuestLinks"><a href="#" class="nav-link-btn highlight-nav" id="navSignupBtn">Crear mi Espacio</a></li>
-        <li id="navUserLogout" class="hidden"><button id="logoutBtn">Cerrar Sesión</button></li>
       </ul>
     </nav>
   </header>
 
   <!-- LANDING PAGE -->
   <div id="landingView" class="view-section">
-    
     <section class="landing-hero" id="hero">
-      
-      <!-- Columna Izquierda -->
       <div class="hero-left-sidebar">
-        <div class="vintage-badge">
-          NEOCITIES VIBES
-        </div>
-
+        <div class="vintage-badge">NEOCITIES VIBES</div>
         <div class="stamp-card">
           <svg class="stamp-flower-svg" viewBox="0 0 60 60">
             <path d="M30,10 C35,20 40,20 50,30 C40,40 35,40 30,50 C25,40 20,40 10,30 C20,20 25,20 30,10 Z" fill="#743014"/>
@@ -50,23 +45,19 @@
           </svg>
           <span class="stamp-label">LOOP POST</span>
         </div>
-
         <div class="note-sticker">
           <div class="vector-pin"></div>
           <p>Un rincón digital independiente, libre y sin algoritmos para tus ideas y momentos.</p>
         </div>
       </div>
 
-      <!-- Tarjeta Central Hero -->
       <div class="hero-center-card">
         <div class="hero-header-decoration">
           <span class="sparkle-icon">✦</span>
           <span class="badge-tag">Prototipo Abierto & Gratuito</span>
           <span class="sparkle-icon">✦</span>
         </div>
-
         <h1>Tu rincón personal en la web <span class="script-accent">sin algoritmos.</span></h1>
-        
         <p class="hero-description">
           Loop es tu bitácora digital vintage para expresar tu arte, compartir pasatiempos, proyectos y recuerdos en un espacio que realmente se siente tuyo.
         </p>
@@ -304,10 +295,9 @@
         <button class="submit-btn main-cta-btn" id="finalCtaBtn">★ Comenzar Ahora - Es Gratis</button>
       </div>
     </section>
-
   </div>
 
-  <!-- VISTA 2: INICIO DE SESIÓN -->
+  <!-- VISTA INICIO SESIÓN -->
   <div id="loginView" class="view-section hidden">
     <section class="hero-banner">
       <span class="badge">Plataforma Creativa</span>
@@ -334,9 +324,7 @@
 
           <button type="submit" class="submit-btn">Iniciar Sesión</button>
         </form>
-
         <hr class="divider">
-
         <div class="recovery-links">
           <a href="#" id="goToSignupLink" class="highlight-link">¿Aún no tienes una cuenta? Regístrate aquí.</a>
         </div>
@@ -344,7 +332,7 @@
     </main>
   </div>
 
-  <!-- VISTA 3: REGISTRO -->
+  <!-- VISTA REGISTRO -->
   <div id="signupView" class="view-section hidden">
     <section class="signup-hero">
       <div class="doodle-bg">
@@ -435,46 +423,56 @@
     </main>
   </div>
 
-  <!-- VISTA 4: PANEL DE CONTROL / DASHBOARD -->
+  <!-- VISTA 4: DASHBOARD / PERFIL -->
   <div id="dashboardView" class="view-section hidden">
-    <main class="journal-container">
+    <div class="neocities-layout">
       
-      <aside class="journal-sidebar">
-        <div class="site-brand">
-          <span id="dashUsernameText">Creador</span>
-          <span>// bitácora personal</span>
+      <aside class="neo-sidebar">
+        <div class="neo-site-title">
+          <h2 id="dashUsernameText">Creador</h2>
+          <span class="neo-site-sub">// bitácora personal</span>
         </div>
         
-        <nav class="nav-pills">
-          <button class="pill-btn active" data-seccion="blog">Inicio / Blog</button>
-          <button class="pill-btn" data-seccion="sobre-mi">Sobre mí</button>
-          <button class="pill-btn" data-seccion="galeria">Galería</button>
-          <button class="pill-btn" data-seccion="visitas">Libro de visitas</button>
-          <button class="pill-btn" data-seccion="enlaces">Enlaces</button>
+        <nav class="neo-nav-list">
+          <span class="neo-nav-label">Navegación</span>
+          <a href="#" class="neo-link active" data-seccion="blog">inicio</a>
+          <a href="#" class="neo-link" data-seccion="sobre-mi">sobre mí</a>
+          <a href="#" class="neo-link" data-seccion="galeria">galería</a>
+          <a href="#" class="neo-link" data-seccion="reviews">reseñas</a>
+          <a href="#" class="neo-link" data-seccion="enlaces">enlaces</a>
         </nav>
 
-        <div class="sidebar-bio">
-          <p style="margin-bottom: 8px;" id="sidebarBioDisplay">"Un rincón digital para archivar ideas, notas de arte, música y proyectos."</p>
-          <button class="submit-btn" id="dashEditBtn" style="width: 100%; margin-top: 10px; font-size: 0.8rem; padding: 8px;">Editar Mi Espacio</button>
+        <div class="neo-sidebar-box">
+          <p id="sidebarBioDisplay" style="margin-bottom: 8px;">"Un rincón digital para archivar ideas, notas de arte, música y proyectos."</p>
+          <button class="neo-action-btn" id="dashEditBtn">Editar espacio</button>
         </div>
 
-        <div class="dash-section">
-          <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.75rem; text-transform: uppercase; color: var(--golden-batter); margin-bottom: 8px; font-weight: 700;">Intereses & Etiquetas</h4>
+        <div class="neo-tags-box">
+          <span class="neo-nav-label">Etiquetas</span>
           <div class="tags-container" id="dashTagsContainer"></div>
+        </div>
+
+        <div class="neo-logout-box">
+          <button id="logoutBtn" class="neo-logout-btn">← Salir de mi cuenta</button>
         </div>
       </aside>
 
-      <section class="journal-content">
+      <main class="neo-main-content">
+        <div class="neo-breadcrumb-bar">
+          <span class="crumb-path"><a href="#" id="homeBreadcrumb">home</a> / <span id="currentPathText">inicio</span></span>
+          <span class="site-domain-tag" id="dashUrlText">usuario.loop.org</span>
+        </div>
+
         <div>
-          <div class="content-header">
-            <div class="header-titles">
-              <h1 id="seccion-titulo">¡HOLA!</h1>
-              <p id="seccion-subtitulo">pensamiento del día // bitácora personal</p>
+          <!-- CABECERA DIVIDIDA: Título a la Izquierda y Spotify Compacto a la Derecha -->
+          <div class="neo-header-split">
+            <div class="neo-header-title-box">
+              <h1 id="seccion-titulo" class="neo-main-title">HELLO</h1>
             </div>
 
-            <div class="spotify-header-card" id="headerSpotifyCard">
-              <div class="spotify-header-note">Una pequeña playlist para tu visita</div>
-              <div class="spotify-iframe-wrapper">
+            <div class="neo-spotify-compact" id="headerSpotifyCard">
+              <span class="inline-note">✶ playlist del rincón</span>
+              <div class="spotify-iframe-wrapper-compact">
                 <iframe 
                   id="spotifyWidgetFrame" 
                   src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0" 
@@ -490,43 +488,43 @@
           </div>
 
           <div id="tab-blog" class="tab-content">
-            <div class="banner-container" id="bannerDisplay">
+            <div class="neo-banner-frame" id="bannerDisplay">
               <img id="bannerImg" src="" alt="Banner del espacio">
             </div>
 
-            <div class="journal-sections-grid">
-              <div class="journal-box">
+            <div class="neo-two-columns">
+              <div class="neo-card-box">
                 <h3>Ahora</h3>
                 <p id="nowStatusText">"Explorando nuevas ideas de diseño, escuchando música y construyendo este espacio."</p>
               </div>
 
-              <div class="journal-box">
+              <div class="neo-card-box">
                 <h3>Actualizaciones</h3>
                 <div id="updatesList" class="updates-list-container">
-                  <p style="opacity: 0.7; font-style: italic; font-size: 0.85rem;">Sin actualizaciones recientes.</p>
+                  <p class="empty-note">Sin actualizaciones recientes.</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div id="tab-sobre-mi" class="tab-content hidden">
-            <div class="journal-box about-bio-box">
+            <div class="neo-card-box about-bio-box">
               <p id="aboutBioText">¡Hola! Soy un creador digital navegando en la web...</p>
             </div>
 
-            <div class="journal-sections-grid" style="margin-top: 20px;">
-              <div class="journal-box">
-                <h3 class="about-section-title">Favoritos...</h3>
+            <div class="neo-two-columns" style="margin-top: 16px;">
+              <div class="neo-card-box">
+                <h3 class="about-section-title">Favoritos</h3>
                 <ul class="about-list" id="aboutFavoritesList"></ul>
               </div>
 
-              <div class="journal-box">
-                <h3 class="about-section-title">Encuéntrame en...</h3>
+              <div class="neo-card-box">
+                <h3 class="about-section-title">Encuéntrame en</h3>
                 <ul class="about-list" id="aboutLinksList"></ul>
               </div>
             </div>
 
-            <div class="banner-container" id="aboutBannerDisplay" style="margin-top: 20px; max-height: 250px;">
+            <div class="neo-banner-frame" id="aboutBannerDisplay" style="margin-top: 16px; max-height: 220px;">
               <img id="aboutBannerImg" src="" alt="Imagen decorativa sobre mí">
             </div>
           </div>
@@ -535,49 +533,57 @@
             <div class="gallery-main-card">
               <div class="photo-corner-topbar">
                 <span class="photo-corner-label">✦ Photo Corner</span>
-                <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="display: flex; gap: 8px; align-items: center;">
                   <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar foto actual">Eliminar foto</button>
                   <div class="view-toggle-btns">
                     <button type="button" id="toggleCarouselView" class="view-switch-btn active">Carrusel</button>
                     <button type="button" id="toggleCalendarView" class="view-switch-btn">Calendario</button>
                   </div>
                 </div>
-                <span class="photo-corner-tagline">little moments, big lore.</span>
               </div>
 
-              <div id="photosCarouselViewMode" class="photo-mode-section">
-                <div class="new-carousel-layout">
+              <div id="photosCarouselViewMode" class="photo-mode-section" style="margin-top: 14px;">
+                <div class="neo-carousel-box">
                   <div class="carousel-image-box">
-                    <button type="button" id="prevPhotoSlide" class="carousel-side-arrow left-arrow">‹</button>
+                    <button type="button" id="prevPhotoSlide" class="carousel-arrow left">‹</button>
                     <div class="slideshow-track" id="photosSlideshowTrack"></div>
-                    <button type="button" id="nextPhotoSlide" class="carousel-side-arrow right-arrow">›</button>
+                    <button type="button" id="nextPhotoSlide" class="carousel-arrow right">›</button>
                   </div>
 
-                  <div class="carousel-post-sidebar">
-                    <h4 class="post-sidebar-title">Historia del Día</h4>
-                    <p id="photoStoryDisplayText" class="post-sidebar-text">Selecciona o sube una fotografía para ver su historia.</p>
-                    <div class="carousel-counter-display" id="photoCounterIndicator">0 / 0</div>
+                  <div class="carousel-meta-box">
+                    <div>
+                      <h4 style="font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine); font-size: 1.1rem; border-bottom: 1px solid var(--olive-harvest); padding-bottom: 4px;">Historia del Día</h4>
+                      <p id="photoStoryDisplayText" style="font-size: 0.88rem; font-style: italic; margin-top: 10px;">Selecciona o sube una fotografía para ver su historia.</p>
+                    </div>
+                    <div class="counter" id="photoCounterIndicator">0 / 0</div>
                   </div>
                 </div>
               </div>
 
-              <div id="photosCalendarViewMode" class="photo-mode-section hidden">
+              <div id="photosCalendarViewMode" class="photo-mode-section hidden" style="margin-top: 14px;">
                 <div class="locket-calendar-container" id="locketCalendarContainer"></div>
               </div>
             </div>
           </div>
 
-        </div>
+          <!-- PESTAÑA DE RESEÑAS / REVIEWS CON FILTRO DE PUNTILLISTO RETRO -->
+          <div id="tab-reviews" class="tab-content hidden">
+            <div class="reviews-wrapper-card">
+              <div class="reviews-topbar">
+                <span class="reviews-tag-label">✦ DIARIO DE PELÍCULAS & LIBROS</span>
+              </div>
+              <div class="reviews-grid" id="reviewsGridContainer">
+                <!-- Se llenará dinámicamente con las tarjetas de reseñas -->
+              </div>
+            </div>
+          </div>
 
-        <div class="journal-footer-note">
-          loop.org // <span id="dashUrlText">usuario.loop.org</span>
         </div>
-      </section>
-
-    </main>
+      </main>
+    </div>
   </div>
 
-  <!-- PIE DE PÁGINA -->
+  <!-- FOOTER GLOBAL -->
   <footer class="footer">
     <div class="footer-left">
       <div class="footer-news">Loop © 2026 — Plataforma de Expresión Digital</div>
@@ -597,111 +603,156 @@
     </ul>
   </footer>
 
-  <!-- MODAL DE EDICIÓN -->
+  <!-- MODAL DE EDICIÓN CON HERRAMIENTA DE RECORTE (CROPPER) -->
   <div id="editModal" class="modal-overlay hidden">
-    <div class="modal-box" style="text-align: left; max-width: 480px;">
-      <h3 style="text-align: center; margin-bottom: 15px;" id="modalEditTitle">Personalizar Mi Espacio</h3>
-      <form id="editForm" style="display: flex; flex-direction: column; gap: 12px;">
+    <div class="clean-modal-box">
+      <h3 id="modalEditTitle">Personalizar Mi Espacio</h3>
+      <form id="editForm" class="clean-form" style="margin-top: 14px;">
         
         <div class="edit-fields-blog">
           <div class="form-group">
-            <label for="editBannerFile" style="font-size: 0.78rem;">Imagen de Banner (Inicio)</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <input type="file" id="editBannerFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
+            <label for="editBannerFile">Imagen de Banner (Inicio)</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <input type="file" id="editBannerFile" accept="image/*" class="file-input">
             </div>
           </div>
           <div class="form-group">
-            <label for="editHeaderTitle" style="font-size: 0.78rem;">Título / Saludo Principal</label>
-            <div class="input-wrapper" style="background: #fff;">
-              <input type="text" id="editHeaderTitle" placeholder="Ej: ¡HOLA!" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
+            <label for="editHeaderTitle">Título / Saludo Principal</label>
+            <div class="input-line">
+              <input type="text" id="editHeaderTitle" placeholder="Ej: ¡HOLA!">
             </div>
           </div>
           <div class="form-group">
-            <label for="editBio" style="font-size: 0.78rem;">Frase Corta (Apartado "Ahora")</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editBio" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
+            <label for="editBio">Frase Corta (Apartado "Ahora")</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editBio" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;"></textarea>
             </div>
           </div>
           <div class="form-group">
-            <label for="editTags" style="font-size: 0.78rem;">Etiquetas (separadas por comas)</label>
-            <div class="input-wrapper" style="background: #fff;">
-              <input type="text" id="editTags" placeholder="arte, musica, peliculas" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
+            <label for="editTags">Etiquetas</label>
+            <div class="input-line">
+              <input type="text" id="editTags" placeholder="arte, musica, dev">
             </div>
           </div>
           <div class="form-group">
-            <label for="editSpotifyUrl" style="font-size: 0.78rem;">Enlace de Playlist de Spotify</label>
-            <div class="input-wrapper" style="background: #fff;">
-              <input type="text" id="editSpotifyUrl" placeholder="https://open.spotify.com/playlist/..." style="width: 100%; border: none; background: transparent; outline: none; padding: 8px;">
+            <label for="editSpotifyUrl">Enlace de Playlist de Spotify</label>
+            <div class="input-line">
+              <input type="text" id="editSpotifyUrl" placeholder="https://open.spotify.com/playlist/...">
             </div>
           </div>
         </div>
 
         <div class="edit-fields-sobremi hidden">
           <div class="form-group">
-            <label for="editAboutBannerFile" style="font-size: 0.78rem;">Imagen Inferior (Sobre Mí)</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <input type="file" id="editAboutBannerFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
+            <label for="editAboutBannerFile">Imagen Inferior (Sobre Mí)</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <input type="file" id="editAboutBannerFile" accept="image/*" class="file-input">
             </div>
           </div>
           <div class="form-group">
-            <label for="editAboutBio" style="font-size: 0.78rem;">Texto de Biografía</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editAboutBio" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
+            <label for="editAboutBio">Texto de Biografía</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editAboutBio" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;"></textarea>
             </div>
           </div>
           <div class="form-group">
-            <label for="editAboutFavorites" style="font-size: 0.78rem;">Favoritos (Formato: Clave: Valor, uno por línea)</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editAboutFavorites" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
+            <label for="editAboutFavorites">Favoritos (Clave: Valor)</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editAboutFavorites" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;"></textarea>
             </div>
           </div>
           <div class="form-group">
-            <label for="editAboutLinks" style="font-size: 0.78rem;">Encuéntrame en... (Formato: Nombre: URL, uno por línea)</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editAboutLinks" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);"></textarea>
+            <label for="editAboutLinks">Encuéntrame en (Nombre: URL)</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editAboutLinks" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;"></textarea>
             </div>
           </div>
         </div>
 
         <div class="edit-fields-galeria hidden">
           <div class="form-group">
-            <label for="editGalleryFile" style="font-size: 0.78rem;">Subir Fotografía</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <input type="file" id="editGalleryFile" accept="image/*" style="width: 100%; border: none; outline: none; font-size: 0.82rem; cursor: pointer;">
+            <label for="editGalleryFile">Subir Fotografía</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <input type="file" id="editGalleryFile" accept="image/*" class="file-input">
             </div>
           </div>
           <div class="form-group">
-            <label for="editGalleryPhotoTitle" style="font-size: 0.78rem;">Título de la Foto (Va a Actualizaciones)</label>
-            <div class="input-wrapper" style="background: #fff;">
-              <input type="text" id="editGalleryPhotoTitle" placeholder="Ej: Noche de hoguera en la playa" style="width: 100%; border: none; background: transparent; outline: none; padding: 8px; font-family: 'Outfit', sans-serif;">
+            <label for="editGalleryPhotoTitle">Título de la Foto</label>
+            <div class="input-line">
+              <input type="text" id="editGalleryPhotoTitle" placeholder="Ej: Recuerdo especial">
             </div>
           </div>
           <div class="form-group">
-            <label for="editGalleryPhotoStory" style="font-size: 0.78rem;">Historia / Post (Corto o largo para el carrusel)</label>
-            <div class="input-wrapper" style="background: #fff; padding: 4px;">
-              <textarea id="editGalleryPhotoStory" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; font-size: 0.85rem; resize: none; color: var(--cowhide-cocoa);" placeholder="Escribe aquí la historia completa de este recuerdo..."></textarea>
+            <label for="editGalleryPhotoStory">Historia / Post</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editGalleryPhotoStory" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Escribe la historia..."></textarea>
             </div>
           </div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-          <button type="button" id="cancelEditBtn" class="submit-btn" style="background-color: var(--olive-harvest); flex: 1; margin-top:0;">Cancelar</button>
-          <button type="submit" class="submit-btn" style="flex: 1; margin-top:0;">Guardar Cambios</button>
+        <!-- FORMULARIO DE RESEÑAS -->
+        <div class="edit-fields-reviews hidden">
+          <div class="form-group">
+            <label for="editReviewFile">Poster / Foto del Libro o Película</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <input type="file" id="editReviewFile" accept="image/*" class="file-input">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editReviewTitle">Título & Año (Ej: Amélie (2001))</label>
+            <div class="input-line">
+              <input type="text" id="editReviewTitle" placeholder="Ej: Portrait of a Lady on Fire (2019)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editReviewSub">Director / Género / Datos</label>
+            <div class="input-line">
+              <input type="text" id="editReviewSub" placeholder="Ej: drama-romance film dir. Céline Sciamma">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editReviewSinopsis">Sinopsis</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editReviewSinopsis" rows="2" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Corta sinopsis del film o libro..."></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editReviewOpinión">Tu Opinión / Crítica</label>
+            <div class="input-line" style="background: #fff; padding: 4px;">
+              <textarea id="editReviewOpinion" rows="3" style="width: 100%; border: none; background: transparent; outline: none; font-family: 'Outfit', sans-serif; resize: none;" placeholder="Escribe tus pensamientos sobre la película/libro..."></textarea>
+            </div>
+          </div>
         </div>
 
+        <!-- Previsualización y Recorte de Imagen -->
+        <div id="cropContainer" class="crop-container hidden">
+          <label style="font-size: 0.8rem; font-weight: bold; color: var(--spiced-wine); display: block; margin-bottom: 6px;">
+            ✦ Ajusta y recorta tu imagen a tu gusto:
+          </label>
+          <div class="cropper-wrapper">
+            <img id="cropImagePreview" src="" alt="Previsualización para recortar">
+          </div>
+        </div>
+
+        <div class="modal-btns-row">
+          <button type="button" id="cancelEditBtn" class="clean-btn secondary" style="background: var(--olive-harvest); color: #fff; border:none; padding:10px; border-radius:4px; font-weight:bold; cursor:pointer;">Cancelar</button>
+          <button type="submit" class="clean-btn primary" style="background: var(--spiced-wine); color: var(--golden-batter); border:none; padding:10px; border-radius:4px; font-weight:bold; cursor:pointer;">Guardar</button>
+        </div>
       </form>
     </div>
   </div>
 
   <div id="customModal" class="modal-overlay hidden">
-    <div class="modal-box">
+    <div class="clean-modal-box text-center">
       <h3 id="modalTitle">Mensaje</h3>
-      <p id="modalMessage">Descripción de la acción.</p>
-      <button id="modalCloseBtn" class="modal-btn">Aceptar</button>
+      <p id="modalMessage" style="margin: 12px 0 18px 0;"></p>
+      <button id="modalCloseBtn" class="submit-btn" style="width:100%; margin-top:0;">Aceptar</button>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Cropper.js JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
