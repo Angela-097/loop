@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // BUSCAR USUARIOS CON COINCIDENCIA DESDE LA PRIMERA LETRA
+  // BUSCAR USUARIOS
   async function buscarYVisitarUsuario(nombreUsuario) {
     const query = nombreUsuario.trim().toLowerCase();
     if (!query) return;
@@ -251,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!supabase) return;
 
-      // Búsqueda con comodín en Supabase (.ilike) desde la primera letra
       const { data: matches, error } = await supabase
         .from('espacios')
         .select('username, tags')
@@ -305,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ABRIR PANEL DE EXPLORAR SITIOS (MODAL)
   async function abrirModalExplorarSitios() {
     if (!exploreModal || !exploreModalGrid) return;
     exploreModalGrid.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:20px;">Cargando espacios...</p>';
@@ -356,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // CAMBIO DE TEMA RÁPIDO DESDE EL SELECTOR DEL SIDEBAR (SOLO EL DUEÑO)
   if (sidebarThemeSelect) {
     sidebarThemeSelect.addEventListener('change', async () => {
       if (!currentUser || viewedUser.username !== currentUser.username) return;
@@ -372,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // GESTIÓN DEL LIBRO DE VISITAS CON HILOS DE RESPUESTA
   if (submitGuestbookBtn) {
     submitGuestbookBtn.addEventListener('click', async () => {
       const nameVal = guestSignerName.value.trim() || "Anónimo";
@@ -541,7 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // INTERRUPTOR DE VISTAS EN GALERÍA
   if (toggleCarouselView && toggleCalendarView) {
     toggleCarouselView.addEventListener('click', () => {
       toggleCarouselView.classList.add('active');
@@ -632,7 +627,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const targetUser = viewedUser || currentUser;
     if (!targetUser) return;
 
-    // Aplicar el tema (paleta de colores) específico del usuario dueño del perfil
     const userTheme = targetUser.site_theme || 'theme-default';
     if (bodyThemeRoot) {
       bodyThemeRoot.className = userTheme;
@@ -640,7 +634,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const esMiPropioEspacio = currentUser && targetUser.username === currentUser.username;
     
-    // Mostrar u ocultar controles de edición y selector de tema según sea tu propio espacio o ajeno
     if (sidebarEditBoxContainer) {
       if (esMiPropioEspacio) sidebarEditBoxContainer.classList.remove('hidden');
       else sidebarEditBoxContainer.classList.add('hidden');
@@ -707,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     poblarFiltroMesesReseñas();
     renderReviewsGrid(esMiPropioEspacio);
 
-    bitacoraEntriesList = Array.isArray(targetUser.bitacora_entries) ? targetUser.bitacora_entries : [];
+    bitacoraEntriesList = Array.isArray(targetUser.bitacora_posts) ? targetUser.bitacora_posts : (Array.isArray(targetUser.bitacora_entries) ? targetUser.bitacora_entries : []);
     renderBitacoraSection(esMiPropioEspacio);
 
     guestbookList = Array.isArray(targetUser.guestbook_entries) ? targetUser.guestbook_entries : [];
@@ -730,7 +723,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // RENDER DE CARRUSEL
   function renderPhotosSlideshow(esMiPropioEspacio) {
     const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
     const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
@@ -829,7 +821,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // RENDER DE ÁLBUM MENSUAL
   function renderLocketCalendar() {
     const locketCalendarContainer = document.getElementById('locketCalendarContainer');
     if (!locketCalendarContainer) return;
@@ -884,7 +875,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // FILTRO DE RESEÑAS POR MES
   function poblarFiltroMesesReseñas() {
     if (!reviewMonthFilter) return;
     
@@ -1033,12 +1023,12 @@ document.addEventListener('DOMContentLoaded', () => {
         delBtn.addEventListener('click', async () => {
           if (!confirm(`¿Eliminar la entrada "${entry.title}"?`)) return;
           bitacoraEntriesList.splice(index, 1);
-          currentUser.bitacora_entries = bitacoraEntriesList;
-          viewedUser.bitacora_entries = bitacoraEntriesList;
+          currentUser.bitacora_posts = bitacoraEntriesList;
+          viewedUser.bitacora_posts = bitacoraEntriesList;
           renderBitacoraSection(true);
 
           if (supabase) {
-            await supabase.from('espacios').update({ bitacora_entries: bitacoraEntriesList }).eq('username', currentUser.username);
+            await supabase.from('espacios').update({ bitacora_posts: bitacoraEntriesList }).eq('username', currentUser.username);
           }
           showModal('Eliminado', 'La entrada ha sido borrada.');
         });
@@ -1092,7 +1082,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // MANEJO DE MULTIMEDIA Y CROPPER
   function inicializarCropper(file, aspectRatio = NaN) {
     uploadedMediaBase64 = null;
     
@@ -1361,8 +1350,8 @@ document.addEventListener('DOMContentLoaded', () => {
               content: postContent,
               date: new Date().toISOString()
             });
-            currentUser.bitacora_entries = bitacoraEntriesList;
-            payload.bitacora_entries = bitacoraEntriesList;
+            currentUser.bitacora_posts = bitacoraEntriesList;
+            payload.bitacora_posts = bitacoraEntriesList;
 
             updateItem = { title: `Nota: ${postTitle}`, type: 'bitacora', date: new Date().toISOString() };
           }
@@ -1455,36 +1444,40 @@ document.addEventListener('DOMContentLoaded', () => {
       const tagsArray = tagsInput ? tagsInput.split(',').map(t => t.trim()) : ['creatividad', 'loop'];
 
       if (supabase) {
+        // 1. Validar primero si el usuario ya existe en la tabla antes de tocar Auth
         const { data: existeUser } = await supabase.from('espacios').select('username').eq('username', username).maybeSingle();
         if (existeUser) {
           showModal('Usuario no disponible', 'Ese nombre de usuario ya está ocupado. Por favor elige otro.');
           return;
         }
 
+        // 2. Validar si el correo ya existe en la tabla de espacios antes de hacer signUp
+        const { data: existeEmail } = await supabase.from('espacios').select('email').eq('email', email).maybeSingle();
+        if (existeEmail) {
+          showModal('Correo registrado', 'Este correo ya tiene una cuenta activa en Loop. Intenta iniciar sesión.');
+          return;
+        }
+
         const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
         if (authError) { 
-          if (authError.message.includes('already registered')) {
-            showModal('Correo registrado', 'Este correo ya tiene una cuenta activa. Intenta iniciar sesión.');
-          } else {
-            showModal('Error de autenticación', authError.message);
-          }
+          showModal('Error de autenticación', authError.message);
           return; 
         }
 
         const userId = authData.user ? authData.user.id : null;
         
         if (userId) {
+          // 3. Inserción estricta respetando solo las columnas existentes de tu tabla
           const { error: dbError } = await supabase.from('espacios').insert([{ 
             id: userId, 
             username, 
             email, 
-            tags: tagsArray, 
-            site_theme: 'theme-default',
+            tags: tagsArray,
             spotify_url: '', 
             photos_stories: [], 
             updates_history: [],
             reviews_list: [],
-            bitacora_entries: [],
+            bitacora_posts: [],
             guestbook_entries: [],
             moodboard_data: { frase: "", paleta: ["#743014", "#84592B", "#9D9167", "#E8D1A7"], imagenes: [] }
           }]);
@@ -1508,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', () => {
         photos_stories: [], 
         updates_history: [], 
         reviews_list: [], 
-        bitacora_entries: [], 
+        bitacora_posts: [], 
         guestbook_entries: [],
         moodboard_data: { frase: "", paleta: ["#743014", "#84592B", "#9D9167", "#E8D1A7"], imagenes: [] } 
       };
@@ -1538,7 +1531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (error) { showModal('Credenciales incorrectas', 'Contraseña no válida.'); return; }
         currentUser = perfil;
       } else {
-        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], site_theme: 'theme-default', spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [], bitacora_entries: [], guestbook_entries: [], moodboard_data: { frase: "", paleta: [], imagenes: [] } };
+        currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], site_theme: 'theme-default', spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [], bitacora_posts: [], guestbook_entries: [], moodboard_data: { frase: "", paleta: [], imagenes: [] } };
       }
       
       viewedUser = currentUser;
