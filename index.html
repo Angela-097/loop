@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Outfit:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
-  <!-- Cropper.js CSS para el recortador de imágenes -->
+  <!-- Cropper.js CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -21,15 +21,28 @@
       <span class="brand-name">loop</span>
     </div>
     <nav class="nav-container">
-      <ul class="nav-links">
-        <li><a href="#hero"><span class="nav-icon">✦</span> Inicio</a></li>
+      <!-- Enlaces para visitantes -->
+      <ul class="nav-links" id="guestNavLinks">
+        <li><a href="#" id="exploreSitesNavBtnGuest"><span class="nav-icon">✦</span> Explorar Sitios</a></li>
         <li><a href="#presentacion"><span class="nav-icon">✧</span> Conócenos</a></li>
-        <li><a href="#comunidad"><span class="nav-icon">✶</span> Espacios</a></li>
         <li><a href="#apoyo"><span class="nav-icon">✦</span> Apoyo</a></li>
         <li><a href="#faq"><span class="nav-icon">✧</span> Duda</a></li>
-        <li id="navGuestLogin"><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
-        <li id="navGuestLinks"><a href="#" class="nav-link-btn highlight-nav" id="navSignupBtn">Crear mi Espacio</a></li>
+        <li><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
+        <li><a href="#" class="nav-link-btn highlight-nav" id="navSignupBtn">Crear mi Espacio</a></li>
       </ul>
+      <!-- Opciones cuando la sesión está iniciada -->
+      <div class="logged-top-bar hidden" id="loggedTopBarOptions">
+        <button type="button" id="exploreSitesNavBtnLogged" class="explore-top-pill"><span class="nav-icon">✦</span> Explorar Sitios</button>
+        <div class="search-user-container">
+          <div class="search-user-wrapper">
+            <input type="text" id="topSearchUserInput" placeholder="Buscar usuario..." autocomplete="off">
+            <span class="search-icon">🔍</span>
+          </div>
+          <!-- Desplegable de resultados de búsqueda en tiempo real -->
+          <div id="searchResultsDropdown" class="search-dropdown hidden"></div>
+        </div>
+        <button type="button" id="backToMySpaceBtn" class="secondary-btn hidden" style="padding: 4px 10px; font-size: 0.8rem;">✦ Mi Espacio</button>
+      </div>
     </nav>
   </header>
 
@@ -112,7 +125,7 @@
       </div>
     </section>
 
-    <!-- SHOWCASE -->
+    <!-- SHOWCASE DE EJEMPLOS -->
     <section class="landing-section" id="comunidad">
       <div class="section-card">
         <h2 class="section-title text-center">Inspírate en otros <span class="script-accent-dark">Espacios</span></h2>
@@ -442,7 +455,7 @@
           <a href="#" class="neo-link" data-seccion="bitacora">bitácora</a>
         </nav>
 
-        <div class="neo-sidebar-box">
+        <div class="neo-sidebar-box" id="sidebarEditBoxContainer">
           <p id="sidebarBioDisplay" style="margin-bottom: 8px;">"Un rincón digital para archivar ideas, notas de arte, música y proyectos."</p>
           <button class="neo-action-btn" id="dashEditBtn">Editar espacio</button>
         </div>
@@ -529,12 +542,12 @@
             </div>
           </div>
 
-          <!-- PESTAÑA DE GALERÍA (CON CARRUSEL Y ÁLBUM MENSUAL) -->
+          <!-- PESTAÑA DE GALERÍA -->
           <div id="tab-galeria" class="tab-content hidden">
             <div class="gallery-main-card">
               <div class="photo-corner-topbar">
                 <span class="photo-corner-label">✦ Photo Corner</span>
-                <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                   <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar elemento actual">Eliminar foto/video</button>
                   <div class="view-toggle-btns">
                     <button type="button" id="toggleCarouselView" class="view-switch-btn active">Carrusel</button>
@@ -567,7 +580,7 @@
             </div>
           </div>
 
-          <!-- PESTAÑA DE RESEÑAS (CON FILTRO POR MES) -->
+          <!-- PESTAÑA DE RESEÑAS -->
           <div id="tab-reviews" class="tab-content hidden">
             <div class="reviews-wrapper-card">
               <div class="reviews-topbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -580,7 +593,7 @@
                 </div>
               </div>
               <div class="reviews-grid" id="reviewsGridContainer" style="margin-top: 14px;">
-                <!-- Se llenará dinámicamente -->
+                <!-- Se llena dinámicamente -->
               </div>
             </div>
           </div>
@@ -599,13 +612,29 @@
             <div class="neo-card-box">
               <h3 style="margin-bottom: 12px;">Entradas del Diario</h3>
               <div class="bitacora-posts-container" id="bitacoraPostsList">
-                <!-- Se llena dinámicamente con las entradas -->
+                <!-- Se llena dinámicamente -->
               </div>
             </div>
           </div>
 
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- MODAL PARA EXPLORAR SITIOS DE OTROS USUARIOS -->
+  <div id="exploreModal" class="modal-overlay hidden">
+    <div class="clean-modal-box" style="max-width: 650px; width: 90%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--olive-harvest); padding-bottom: 8px; margin-bottom: 14px;">
+        <h3 style="margin: 0; font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine);">✦ Explorar Espacios de la Comunidad</h3>
+        <button type="button" id="closeExploreModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--spiced-wine);">✕</button>
+      </div>
+      
+      <p style="font-size: 0.88rem; color: var(--olive-harvest); margin-bottom: 12px;">Descubre y visita los rincones creados por otros miembros en Loop:</p>
+      
+      <div id="communitySitesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
+        <!-- Se llena dinámicamente con la base de datos -->
+      </div>
     </div>
   </div>
 
@@ -749,7 +778,6 @@
           </div>
         </div>
 
-        <!-- FORMULARIO DE BITÁCORA & MOODBOARD -->
         <div class="edit-fields-bitacora hidden">
           <div class="form-group">
             <label for="editMoodboardQuote">Frase / Poema del Momento</label>
@@ -779,7 +807,6 @@
           </div>
         </div>
 
-        <!-- Previsualización y Recorte -->
         <div id="cropContainer" class="crop-container hidden">
           <label style="font-size: 0.8rem; font-weight: bold; color: var(--spiced-wine); display: block; margin-bottom: 6px;">
             ✦ Ajusta y recorta tu imagen a tu gusto:

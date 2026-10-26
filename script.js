@@ -22,6 +22,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const brandNav = document.getElementById('brandNav');
   const logoutBtn = document.getElementById('logoutBtn');
 
+  // EXPLORAR SITIOS (BOTONES Y MODAL)
+  const exploreSitesNavBtnGuest = document.getElementById('exploreSitesNavBtnGuest');
+  const exploreSitesNavBtnLogged = document.getElementById('exploreSitesNavBtnLogged');
+  const exploreModal = document.getElementById('exploreModal');
+  const closeExploreModalBtn = document.getElementById('closeExploreModalBtn');
+  const communitySitesGrid = document.getElementById('communitySitesGrid');
+
+  // NAVEGACIÓN SUPERIOR Y BUSCADOR EN TIEMPO REAL
+  const guestNavLinks = document.getElementById('guestNavLinks');
+  const loggedTopBarOptions = document.getElementById('loggedTopBarOptions');
+  const topSearchUserInput = document.getElementById('topSearchUserInput');
+  const searchResultsDropdown = document.getElementById('searchResultsDropdown');
+  const backToMySpaceBtn = document.getElementById('backToMySpaceBtn');
+
   const selectPlanBtns = document.querySelectorAll('.select-plan-btn');
   const donateCoffeeBtn = document.getElementById('donateCoffeeBtn');
   const feedbackBtn = document.getElementById('feedbackBtn');
@@ -38,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashUrlText = document.getElementById('dashUrlText');
   const dashTagsContainer = document.getElementById('dashTagsContainer');
   const dashEditBtn = document.getElementById('dashEditBtn');
+  const sidebarEditBoxContainer = document.getElementById('sidebarEditBoxContainer');
   
   const seccionTitulo = document.getElementById('seccion-titulo');
   const currentPathText = document.getElementById('currentPathText');
@@ -112,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const bitacoraPostsList = document.getElementById('bitacoraPostsList');
 
   let currentUser = null;
+  let viewedUser = null;
   let cropperInstance = null;
   let seccionActualActiva = 'blog';
   let uploadedMediaBase64 = null;
@@ -131,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'bitacora': { titulo: 'BITÁCORA', path: 'bitácora & moodboard' }
   };
 
+  // NAVEGACIÓN EN PESTAÑAS
   botonesPill.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -182,7 +199,154 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // INTERRUPTOR DE VISTAS (CARRUSEL vs ÁLBUM MENSUAL)
+  // MODAL DE EXPLORAR SITIOS DE LA COMUNIDAD
+  async function cargarSitiosComunidad() {
+    if (!communitySitesGrid) return;
+    communitySitesGrid.innerHTML = '<p style="font-style:italic; font-size:0.85rem;">Cargando espacios registrados...</p>';
+
+    if (!supabase) {
+      communitySitesGrid.innerHTML = `
+        <div style="padding:10px; border:1px solid var(--olive-harvest); border-radius:4px; background:#fff;">
+          <strong>ev3lyn.loop.org</strong>
+          <p style="font-size:0.75rem; margin-top:4px;">"Bitácora personal de arte y música."</p>
+        </div>
+      `;
+      return;
+    }
+
+    try {
+      const { data: espacios, error } = await supabase.from('espacios').select('username, bio, tags, header_title').limit(20);
+      if (error || !espacios || espacios.length === 0) {
+        communitySitesGrid.innerHTML = '<p style="font-style:italic; font-size:0.85rem;">No se encontraron otros espacios aún.</p>';
+        return;
+      }
+
+      communitySitesGrid.innerHTML = '';
+      espacios.forEach(esp => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding: 10px; border: 1px solid var(--olive-harvest); border-radius: 6px; background: #fff; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
+        
+        const tagsStr = Array.isArray(esp.tags) ? esp.tags.map(t => `#${t}`).join(' ') : '#loop';
+
+        item.innerHTML = `
+          <div>
+            <strong style="color: var(--spiced-wine); font-family: 'Space Mono', monospace; font-size: 0.85rem;">${esp.username}.loop.org</strong>
+            <p style="font-size: 0.78rem; font-style: italic; margin-top: 4px; color: #444;">${esp.bio || "Espacio creativo personal."}</p>
+          </div>
+          <div>
+            <span style="font-size: 0.7rem; color: var(--toasted-caramel);">${tagsStr}</span>
+            <button type="button" class="visit-site-btn" style="width:100%; margin-top:6px; background: var(--spiced-wine); color: var(--golden-batter); border: none; padding: 4px; border-radius: 3px; font-size: 0.75rem; font-weight: bold; cursor: pointer;">Visitar Espacio</button>
+          </div>
+        `;
+
+        const btnVisitar = item.querySelector('.visit-site-btn');
+        btnVisitar.addEventListener('click', async () => {
+          if (exploreModal) exploreModal.classList.add('hidden');
+          const { data: perfilElegido } = await supabase.from('espacios').select('*').eq('username', esp.username).single();
+          if (perfilElegido) {
+            viewedUser = perfilElegido;
+            switchView('dashboard');
+          }
+        });
+
+        communitySitesGrid.appendChild(item);
+      });
+    } catch (err) {
+      console.error("Error al cargar la comunidad:", err);
+      communitySitesGrid.innerHTML = '<p style="font-style:italic; font-size:0.85rem;">Error al conectar con la comunidad.</p>';
+    }
+  }
+
+  if (exploreSitesNavBtnGuest) {
+    exploreSitesNavBtnGuest.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (exploreModal) exploreModal.classList.remove('hidden');
+      cargarSitiosComunidad();
+    });
+  }
+
+  if (exploreSitesNavBtnLogged) {
+    exploreSitesNavBtnLogged.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (exploreModal) exploreModal.classList.remove('hidden');
+      cargarSitiosComunidad();
+    });
+  }
+
+  if (closeExploreModalBtn) {
+    closeExploreModalBtn.addEventListener('click', () => {
+      if (exploreModal) exploreModal.classList.add('hidden');
+    });
+  }
+
+  // BUSCADOR EN TIEMPO REAL DESDE LA PRIMERA LETRA
+  if (topSearchUserInput && searchResultsDropdown) {
+    topSearchUserInput.addEventListener('input', async (e) => {
+      const query = e.target.value.trim().toLowerCase();
+      if (!query || !supabase) {
+        searchResultsDropdown.classList.add('hidden');
+        searchResultsDropdown.innerHTML = '';
+        return;
+      }
+
+      try {
+        const { data: resultados, error } = await supabase
+          .from('espacios')
+          .select('username, bio')
+          .ilike('username', `%${query}%`)
+          .limit(5);
+
+        if (error || !resultados || resultados.length === 0) {
+          searchResultsDropdown.innerHTML = '<div style="padding: 8px 12px; font-size: 0.78rem; color: #777;">Sin coincidencias</div>';
+          searchResultsDropdown.classList.remove('hidden');
+          return;
+        }
+
+        searchResultsDropdown.innerHTML = '';
+        resultados.forEach(res => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'search-dropdown-item';
+          itemDiv.innerHTML = `
+            <strong>${res.username}.loop.org</strong>
+            <span>${res.bio ? res.bio.substring(0, 35) + '...' : 'Sin biografía'}</span>
+          `;
+
+          itemDiv.addEventListener('click', async () => {
+            searchResultsDropdown.classList.add('hidden');
+            topSearchUserInput.value = '';
+            const { data: perfilElegido } = await supabase.from('espacios').select('*').eq('username', res.username).single();
+            if (perfilElegido) {
+              viewedUser = perfilElegido;
+              switchView('dashboard');
+            }
+          });
+
+          searchResultsDropdown.appendChild(itemDiv);
+        });
+
+        searchResultsDropdown.classList.remove('hidden');
+      } catch (err) {
+        console.error("Error en búsqueda:", err);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!topSearchUserInput.contains(e.target) && !searchResultsDropdown.contains(e.target)) {
+        searchResultsDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  if (backToMySpaceBtn) {
+    backToMySpaceBtn.addEventListener('click', () => {
+      if (currentUser) {
+        viewedUser = currentUser;
+        switchView('dashboard');
+      }
+    });
+  }
+
+  // INTERRUPTOR DE VISTAS EN GALERÍA
   if (toggleCarouselView && toggleCalendarView) {
     toggleCarouselView.addEventListener('click', () => {
       toggleCarouselView.classList.add('active');
@@ -245,8 +409,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (brandNav) {
     brandNav.addEventListener('click', (e) => {
       e.preventDefault();
-      if (currentUser) switchView('dashboard');
-      else switchView('landing');
+      if (currentUser) {
+        viewedUser = currentUser;
+        switchView('dashboard');
+      } else {
+        switchView('landing');
+      }
     });
   }
 
@@ -266,26 +434,44 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderDashboard() {
-    if (!currentUser) return;
+    const targetUser = viewedUser || currentUser;
+    if (!targetUser) return;
 
-    if (dashUsernameText) dashUsernameText.textContent = currentUser.username;
-    if (dashUrlText) dashUrlText.textContent = `${currentUser.username}.loop.org`;
-    if (seccionTitulo) seccionTitulo.textContent = currentUser.header_title || "HELLO";
-    if (nowStatusText) nowStatusText.textContent = `"${currentUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio."}"`;
+    const esMiPropioEspacio = currentUser && targetUser.username === currentUser.username;
+    if (sidebarEditBoxContainer) {
+      if (esMiPropioEspacio) {
+        sidebarEditBoxContainer.classList.remove('hidden');
+      } else {
+        sidebarEditBoxContainer.classList.add('hidden');
+      }
+    }
+
+    if (backToMySpaceBtn) {
+      if (esMiPropioEspacio) {
+        backToMySpaceBtn.classList.add('hidden');
+      } else {
+        backToMySpaceBtn.classList.remove('hidden');
+      }
+    }
+
+    if (dashUsernameText) dashUsernameText.textContent = targetUser.username;
+    if (dashUrlText) dashUrlText.textContent = `${targetUser.username}.loop.org`;
+    if (seccionTitulo) seccionTitulo.textContent = targetUser.header_title || "HELLO";
+    if (nowStatusText) nowStatusText.textContent = `"${targetUser.bio || "Explorando nuevas ideas de diseño y construyendo este espacio."}"`;
 
     if (bannerImg) {
-      if (currentUser.banner_url) { bannerImg.src = currentUser.banner_url; bannerImg.style.display = 'block'; }
+      if (targetUser.banner_url) { bannerImg.src = targetUser.banner_url; bannerImg.style.display = 'block'; }
       else { bannerImg.removeAttribute('src'); }
     }
     if (aboutBannerImg) {
-      if (currentUser.about_banner_url) { aboutBannerImg.src = currentUser.about_banner_url; aboutBannerImg.style.display = 'block'; }
+      if (targetUser.about_banner_url) { aboutBannerImg.src = targetUser.about_banner_url; aboutBannerImg.style.display = 'block'; }
       else { aboutBannerImg.removeAttribute('src'); }
     }
-    if (aboutBioText) aboutBioText.textContent = currentUser.about_bio || "¡Hola! Soy un creador digital navegando en la web...";
+    if (aboutBioText) aboutBioText.textContent = targetUser.about_bio || "¡Hola! Soy un creador digital navegando en la web...";
 
     if (aboutFavoritesList) {
       aboutFavoritesList.innerHTML = '';
-      const favs = currentUser.about_favorites || [];
+      const favs = targetUser.about_favorites || [];
       favs.forEach(item => {
         const li = document.createElement('li');
         const parts = item.split(':');
@@ -296,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (aboutLinksList) {
       aboutLinksList.innerHTML = '';
-      const links = currentUser.about_links || [];
+      const links = targetUser.about_links || [];
       links.forEach(item => {
         const li = document.createElement('li');
         const parts = item.split(':');
@@ -305,25 +491,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    photosStoriesList = Array.isArray(currentUser.photos_stories) ? currentUser.photos_stories : [];
-    renderPhotosSlideshow();
+    photosStoriesList = Array.isArray(targetUser.photos_stories) ? targetUser.photos_stories : [];
+    renderPhotosSlideshow(esMiPropioEspacio);
 
-    updatesHistoryList = Array.isArray(currentUser.updates_history) ? currentUser.updates_history : [];
+    updatesHistoryList = Array.isArray(targetUser.updates_history) ? targetUser.updates_history : [];
     renderUpdatesList();
 
-    reviewsList = Array.isArray(currentUser.reviews_list) ? currentUser.reviews_list : [];
+    reviewsList = Array.isArray(targetUser.reviews_list) ? targetUser.reviews_list : [];
     poblarFiltroMesesReseñas();
-    renderReviewsGrid();
+    renderReviewsGrid(esMiPropioEspacio);
 
-    bitacoraEntriesList = Array.isArray(currentUser.bitacora_entries) ? currentUser.bitacora_entries : [];
-    renderBitacoraSection();
+    bitacoraEntriesList = Array.isArray(targetUser.bitacora_entries) ? targetUser.bitacora_entries : [];
+    renderBitacoraSection(esMiPropioEspacio);
 
-    actualizarReproductorSpotify(currentUser.spotify_url);
+    actualizarReproductorSpotify(targetUser.spotify_url);
 
     if (dashTagsContainer) {
       dashTagsContainer.innerHTML = '';
-      if (currentUser.tags && currentUser.tags.length > 0) {
-        currentUser.tags.forEach(tag => {
+      if (targetUser.tags && targetUser.tags.length > 0) {
+        targetUser.tags.forEach(tag => {
           const span = document.createElement('span');
           span.className = 'tag-chip';
           span.textContent = `#${tag.trim()}`;
@@ -336,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // RENDER DE CARRUSEL
-  function renderPhotosSlideshow() {
+  function renderPhotosSlideshow(esMiPropioEspacio) {
     const photosSlideshowTrack = document.getElementById('photosSlideshowTrack');
     const photoStoryDisplayText = document.getElementById('photoStoryDisplayText');
     const photoCounterIndicator = document.getElementById('photoCounterIndicator');
@@ -346,13 +532,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (photosStoriesList.length === 0) {
       photosSlideshowTrack.innerHTML = `<div class="slide-card-large"><p style="font-style:italic; padding:40px; text-align:center;">Sin fotos ni videos registrados</p></div>`;
-      if (photoStoryDisplayText) photoStoryDisplayText.textContent = "Sube tu primera foto o video con historia desde el menú de edición.";
+      if (photoStoryDisplayText) photoStoryDisplayText.textContent = "Este espacio aún no tiene fotos o videos con historia.";
       if (photoCounterIndicator) photoCounterIndicator.textContent = "0 / 0";
       if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.add('hidden');
       return;
     }
 
-    if (deleteCurrentPhotoBtn) deleteCurrentPhotoBtn.classList.remove('hidden');
+    if (deleteCurrentPhotoBtn) {
+      if (esMiPropioEspacio) deleteCurrentPhotoBtn.classList.remove('hidden');
+      else deleteCurrentPhotoBtn.classList.add('hidden');
+    }
 
     photosStoriesList.forEach((item) => {
       const card = document.createElement('div');
@@ -391,6 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (deleteCurrentPhotoBtn) {
     deleteCurrentPhotoBtn.addEventListener('click', async () => {
+      if (!currentUser || viewedUser.username !== currentUser.username) return;
       if (photosStoriesList.length === 0) return;
       if (!confirm('¿Seguro que deseas eliminar este elemento?')) return;
 
@@ -400,10 +590,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       currentUser.photos_stories = photosStoriesList;
-      renderPhotosSlideshow();
+      viewedUser.photos_stories = photosStoriesList;
+      renderPhotosSlideshow(true);
       renderLocketCalendar();
 
-      if (supabase && currentUser) {
+      if (supabase) {
         await supabase.from('espacios').update({ photos_stories: photosStoriesList }).eq('username', currentUser.username);
       }
       showModal('Eliminado', 'El elemento ha sido borrado.');
@@ -484,11 +675,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- FILTRO DE RESEÑAS POR MES ---
+  // FILTRO DE RESEÑAS POR MES
   function poblarFiltroMesesReseñas() {
     if (!reviewMonthFilter) return;
     
-    // Guardar selección actual si existe
     const selectedVal = reviewMonthFilter.value;
     reviewMonthFilter.innerHTML = '<option value="all">Todos los meses</option>';
 
@@ -513,11 +703,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (reviewMonthFilter) {
     reviewMonthFilter.addEventListener('change', () => {
-      renderReviewsGrid();
+      const esMiPropioEspacio = currentUser && viewedUser && viewedUser.username === currentUser.username;
+      renderReviewsGrid(esMiPropioEspacio);
     });
   }
 
-  function renderReviewsGrid() {
+  function renderReviewsGrid(esMiPropioEspacio) {
     if (!reviewsGridContainer) return;
     reviewsGridContainer.innerHTML = '';
 
@@ -537,13 +728,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     filteredReviews.forEach((rev) => {
-      // Encontrar el índice real en la lista general para poder borrar correctamente
       const realIndex = reviewsList.findIndex(r => r === rev);
 
       const card = document.createElement('div');
       card.className = 'review-card-item';
       card.innerHTML = `
-        <button type="button" class="delete-review-btn" title="Eliminar reseña">✕</button>
+        ${esMiPropioEspacio ? '<button type="button" class="delete-review-btn" title="Eliminar reseña">✕</button>' : ''}
         <div class="review-poster-box">
           <img src="${rev.url}" alt="${rev.title}">
         </div>
@@ -555,26 +745,30 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      const delBtn = card.querySelector('.delete-review-btn');
-      delBtn.addEventListener('click', async () => {
-        if (!confirm(`¿Eliminar la reseña de "${rev.title}"?`)) return;
-        reviewsList.splice(realIndex, 1);
-        currentUser.reviews_list = reviewsList;
-        poblarFiltroMesesReseñas();
-        renderReviewsGrid();
+      if (esMiPropioEspacio) {
+        const delBtn = card.querySelector('.delete-review-btn');
+        delBtn.addEventListener('click', async () => {
+          if (!confirm(`¿Eliminar la reseña de "${rev.title}"?`)) return;
+          reviewsList.splice(realIndex, 1);
+          currentUser.reviews_list = reviewsList;
+          viewedUser.reviews_list = reviewsList;
+          poblarFiltroMesesReseñas();
+          renderReviewsGrid(true);
 
-        if (supabase && currentUser) {
-          await supabase.from('espacios').update({ reviews_list: reviewsList }).eq('username', currentUser.username);
-        }
-        showModal('Eliminado', 'La reseña ha sido borrada.');
-      });
+          if (supabase) {
+            await supabase.from('espacios').update({ reviews_list: reviewsList }).eq('username', currentUser.username);
+          }
+          showModal('Eliminado', 'La reseña ha sido borrada.');
+        });
+      }
 
       reviewsGridContainer.appendChild(card);
     });
   }
 
-  function renderBitacoraSection() {
-    const moodboardData = currentUser.moodboard_data || { frase: "", paleta: [], imagenes: [] };
+  function renderBitacoraSection(esMiPropioEspacio) {
+    const targetUser = viewedUser || currentUser;
+    const moodboardData = targetUser.moodboard_data || { frase: "", paleta: [], imagenes: [] };
 
     if (moodboardQuoteDisplay) {
       moodboardQuoteDisplay.textContent = moodboardData.frase ? `"${moodboardData.frase}"` : '"Creando pequeñas cosas con gran significado."';
@@ -606,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bitacoraPostsList.innerHTML = '';
 
     if (bitacoraEntriesList.length === 0) {
-      bitacoraPostsList.innerHTML = `<p class="empty-note" style="text-align:center; padding:20px;">Aún no has escrito entradas en tu bitácora. Pulsa 'Editar espacio' para escribir tu primera nota.</p>`;
+      bitacoraPostsList.innerHTML = `<p class="empty-note" style="text-align:center; padding:20px;">Aún no hay entradas en esta bitácora.</p>`;
       return;
     }
 
@@ -617,7 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const formattedDate = dateObj.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
 
       card.innerHTML = `
-        <button type="button" class="delete-post-btn" title="Eliminar entrada">✕</button>
+        ${esMiPropioEspacio ? '<button type="button" class="delete-post-btn" title="Eliminar entrada">✕</button>' : ''}
         <div class="bitacora-post-header">
           <h4 class="bitacora-post-title">${entry.title}</h4>
           <span class="bitacora-post-date">${formattedDate}</span>
@@ -625,18 +819,21 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="bitacora-post-content">${entry.content}</div>
       `;
 
-      const delBtn = card.querySelector('.delete-post-btn');
-      delBtn.addEventListener('click', async () => {
-        if (!confirm(`¿Eliminar la entrada "${entry.title}"?`)) return;
-        bitacoraEntriesList.splice(index, 1);
-        currentUser.bitacora_entries = bitacoraEntriesList;
-        renderBitacoraSection();
+      if (esMiPropioEspacio) {
+        const delBtn = card.querySelector('.delete-post-btn');
+        delBtn.addEventListener('click', async () => {
+          if (!confirm(`¿Eliminar la entrada "${entry.title}"?`)) return;
+          bitacoraEntriesList.splice(index, 1);
+          currentUser.bitacora_entries = bitacoraEntriesList;
+          viewedUser.bitacora_entries = bitacoraEntriesList;
+          renderBitacoraSection(true);
 
-        if (supabase && currentUser) {
-          await supabase.from('espacios').update({ bitacora_entries: bitacoraEntriesList }).eq('username', currentUser.username);
-        }
-        showModal('Eliminado', 'La entrada ha sido borrada.');
-      });
+          if (supabase) {
+            await supabase.from('espacios').update({ bitacora_entries: bitacoraEntriesList }).eq('username', currentUser.username);
+          }
+          showModal('Eliminado', 'La entrada ha sido borrada.');
+        });
+      }
 
       bitacoraPostsList.appendChild(card);
     });
@@ -686,7 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // MANEJO DE MULTIMEDIA (FOTOS / VIDEOS)
+  // MANEJO DE MULTIMEDIA Y CROPPER
   function inicializarCropper(file, aspectRatio = NaN) {
     uploadedMediaBase64 = null;
     
@@ -771,7 +968,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (dashEditBtn) {
     dashEditBtn.addEventListener('click', () => {
-      if (!currentUser) return;
+      if (!currentUser || viewedUser.username !== currentUser.username) return;
       limpiarCropper();
 
       if (editFieldsBlog) editFieldsBlog.classList.add('hidden');
@@ -858,6 +1055,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (editForm) {
     editForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!currentUser || viewedUser.username !== currentUser.username) return;
       
       let payload = {};
       let updateItem = null;
@@ -906,7 +1104,7 @@ document.addEventListener('DOMContentLoaded', () => {
           currentUser.photos_stories = photosStoriesList;
           payload.photos_stories = photosStoriesList;
           currentPhotoSlideIndex = photosStoriesList.length - 1;
-          renderPhotosSlideshow();
+          renderPhotosSlideshow(true);
           renderLocketCalendar();
           
           updateItem = { title: photoTitle, type: 'galeria', photoUrl: mediaUrl, date: new Date().toISOString() };
@@ -927,7 +1125,7 @@ document.addEventListener('DOMContentLoaded', () => {
           currentUser.reviews_list = reviewsList;
           payload.reviews_list = reviewsList;
           poblarFiltroMesesReseñas();
-          renderReviewsGrid();
+          renderReviewsGrid(true);
 
           updateItem = { title: `Reseña: ${revTitle}`, type: 'reviews', date: new Date().toISOString() };
 
@@ -960,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateItem = { title: `Nota: ${postTitle}`, type: 'bitacora', date: new Date().toISOString() };
           }
 
-          renderBitacoraSection();
+          renderBitacoraSection(true);
 
         } else {
           const nuevoTitulo = (editHeaderTitleInput && editHeaderTitleInput.value.trim()) || "HELLO";
@@ -990,7 +1188,9 @@ document.addEventListener('DOMContentLoaded', () => {
           renderUpdatesList();
         }
 
-        if (supabase && currentUser) {
+        viewedUser = currentUser;
+
+        if (supabase) {
           const { error } = await supabase.from('espacios').update(payload).eq('username', currentUser.username);
           if (error) {
             console.error("Error al actualizar en Supabase:", error);
@@ -1099,7 +1299,11 @@ document.addEventListener('DOMContentLoaded', () => {
         bitacora_entries: [], 
         moodboard_data: { frase: "", paleta: ["#743014", "#84592B", "#9D9167", "#E8D1A7"], imagenes: [] } 
       };
+      viewedUser = currentUser;
       
+      if (guestNavLinks) guestNavLinks.classList.add('hidden');
+      if (loggedTopBarOptions) loggedTopBarOptions.classList.remove('hidden');
+
       showModal(
         '¡Espacio Creado con Éxito!', 
         `Lo que estás a punto de probar es solo un prototipo, se está preparando la versión final, espero les guste.\n\nBienvenido a tu espacio: ${username}.loop.org`, 
@@ -1124,6 +1328,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = { username: usernameInput, email: `${usernameInput}@loop.org`, tags: ['creatividad'], spotify_url: '', photos_stories: [], updates_history: [], reviews_list: [], bitacora_entries: [], moodboard_data: { frase: "", paleta: [], imagenes: [] } };
       }
       
+      viewedUser = currentUser;
+
+      if (guestNavLinks) guestNavLinks.classList.add('hidden');
+      if (loggedTopBarOptions) loggedTopBarOptions.classList.remove('hidden');
+
       showModal('¡Bienvenido de nuevo!', `Lo que estás a punto de probar es solo un prototipo, se está preparando la versión final, espero les guste.\n\nAccediendo a: ${currentUser.username}.loop.org...`, () => { switchView('dashboard'); });
     });
   }
@@ -1132,6 +1341,11 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', async () => {
       if (supabase) await supabase.auth.signOut();
       currentUser = null;
+      viewedUser = null;
+
+      if (guestNavLinks) guestNavLinks.classList.remove('hidden');
+      if (loggedTopBarOptions) loggedTopBarOptions.classList.add('hidden');
+
       showModal('Sesión Cerrada', 'Has salido de tu cuenta.', () => { switchView('landing'); });
     });
   }
@@ -1143,11 +1357,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data: perfil } = await supabase.from('espacios').select('*').eq('id', session.user.id).single();
         if (perfil) {
           currentUser = perfil;
+          viewedUser = perfil;
+          if (guestNavLinks) guestNavLinks.classList.add('hidden');
+          if (loggedTopBarOptions) loggedTopBarOptions.classList.remove('hidden');
           switchView('dashboard');
           return;
         }
       }
     }
+    if (guestNavLinks) guestNavLinks.classList.remove('hidden');
+    if (loggedTopBarOptions) loggedTopBarOptions.classList.add('hidden');
     switchView('landing');
   }
 
