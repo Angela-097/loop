@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body id="bodyThemeRoot" class="theme-default">
 
   <!-- ENCABEZADO GLOBAL -->
   <header class="top-bar">
@@ -23,23 +23,21 @@
     <nav class="nav-container">
       <!-- Enlaces para visitantes -->
       <ul class="nav-links" id="guestNavLinks">
-        <li><a href="#" id="exploreSitesNavBtnGuest"><span class="nav-icon">✦</span> Explorar Sitios</a></li>
         <li><a href="#presentacion"><span class="nav-icon">✧</span> Conócenos</a></li>
-        <li><a href="#apoyo"><span class="nav-icon">✦</span> Apoyo</a></li>
-        <li><a href="#faq"><span class="nav-icon">✧</span> Duda</a></li>
+        <li><a href="#comunidad"><span class="nav-icon">✦</span> Explorar Espacios</a></li>
+        <li><a href="#apoyo"><span class="nav-icon">✧</span> Apoyo</a></li>
+        <li><a href="#faq"><span class="nav-icon">✦</span> Duda</a></li>
         <li><a href="#" class="nav-link-btn" id="navLoginBtn">Iniciar Sesión</a></li>
         <li><a href="#" class="nav-link-btn highlight-nav" id="navSignupBtn">Crear mi Espacio</a></li>
       </ul>
-      <!-- Opciones cuando la sesión está iniciada -->
+      <!-- Buscador y opciones cuando la sesión está iniciada -->
       <div class="logged-top-bar hidden" id="loggedTopBarOptions">
-        <button type="button" id="exploreSitesNavBtnLogged" class="explore-top-pill"><span class="nav-icon">✦</span> Explorar Sitios</button>
-        <div class="search-user-container">
-          <div class="search-user-wrapper">
-            <input type="text" id="topSearchUserInput" placeholder="Buscar usuario..." autocomplete="off">
-            <span class="search-icon">🔍</span>
-          </div>
-          <!-- Desplegable de resultados de búsqueda en tiempo real -->
-          <div id="searchResultsDropdown" class="search-dropdown hidden"></div>
+        <button type="button" id="exploreSitesBtn" class="secondary-btn" style="padding: 4px 10px; font-size: 0.8rem; background: var(--golden-batter); color: var(--spiced-wine); border-color: var(--spiced-wine);">✦ Explorar Sitios</button>
+        <div class="search-user-wrapper" style="position: relative;">
+          <input type="text" id="topSearchUserInput" placeholder="Buscar usuario..." autocomplete="off">
+          <button type="button" id="topSearchUserBtn">✦</button>
+          <!-- Sugerencias en tiempo real -->
+          <div id="searchSuggestionsBox" class="search-suggestions-dropdown hidden"></div>
         </div>
         <button type="button" id="backToMySpaceBtn" class="secondary-btn hidden" style="padding: 4px 10px; font-size: 0.8rem;">✦ Mi Espacio</button>
       </div>
@@ -125,10 +123,10 @@
       </div>
     </section>
 
-    <!-- SHOWCASE DE EJEMPLOS -->
+    <!-- SHOWCASE DE EXPLORAR ESPACIOS -->
     <section class="landing-section" id="comunidad">
       <div class="section-card">
-        <h2 class="section-title text-center">Inspírate en otros <span class="script-accent-dark">Espacios</span></h2>
+        <h2 class="section-title text-center">Explora y descubre otros <span class="script-accent-dark">Espacios</span></h2>
         <p class="section-subtitle text-center">Así es como se verán los rincones creados por la comunidad en Loop.</p>
 
         <div class="showcase-grid">
@@ -445,6 +443,18 @@
           <h2 id="dashUsernameText">Creador</h2>
           <span class="neo-site-sub">// bitácora personal</span>
         </div>
+
+        <!-- SELECTOR DE TEMA ESTILO NEOCITIES EN EL SIDEBAR -->
+        <div class="theme-sidebar-box" id="themeSelectorSidebarBox">
+          <span class="neo-nav-label">Theme</span>
+          <select id="sidebarThemeSelect" class="neocities-theme-dropdown">
+            <option value="theme-default">Vintage Clásico</option>
+            <option value="theme-matcha">Matcha Latte</option>
+            <option value="theme-pistachio">Pistachio & Chai</option>
+            <option value="theme-senga">Senga Sengana</option>
+            <option value="theme-jacaranda">Jacarandas & Cielo</option>
+          </select>
+        </div>
         
         <nav class="neo-nav-list">
           <span class="neo-nav-label">Navegación</span>
@@ -453,6 +463,7 @@
           <a href="#" class="neo-link" data-seccion="galeria">galería</a>
           <a href="#" class="neo-link" data-seccion="reviews">reseñas</a>
           <a href="#" class="neo-link" data-seccion="bitacora">bitácora</a>
+          <a href="#" class="neo-link" data-seccion="guestbook">libro de visitas</a>
         </nav>
 
         <div class="neo-sidebar-box" id="sidebarEditBoxContainer">
@@ -547,7 +558,7 @@
             <div class="gallery-main-card">
               <div class="photo-corner-topbar">
                 <span class="photo-corner-label">✦ Photo Corner</span>
-                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 8px; align-items: center;">
                   <button type="button" id="deleteCurrentPhotoBtn" class="delete-item-btn hidden" title="Eliminar elemento actual">Eliminar foto/video</button>
                   <div class="view-toggle-btns">
                     <button type="button" id="toggleCarouselView" class="view-switch-btn active">Carrusel</button>
@@ -617,23 +628,45 @@
             </div>
           </div>
 
+          <!-- PESTAÑA DE LIBRO DE VISITAS (GUESTBOOK) CON HILOS DE RESPUESTA -->
+          <div id="tab-guestbook" class="tab-content hidden">
+            <div class="neo-card-box">
+              <h3 style="margin-bottom: 8px;">✦ Libro de Visitas (Guestbook)</h3>
+              <p style="font-size: 0.85rem; color: var(--toasted-caramel); margin-bottom: 14px;">Deja un saludo o firma en el rincón digital de este creador.</p>
+              
+              <!-- Formulario para dejar mensaje principal -->
+              <div id="guestbookFormContainer" class="guestbook-form-box" style="background: var(--cream-soft); padding: 12px; border-radius: 6px; border: 1px dashed var(--olive-harvest); margin-bottom: 16px;">
+                <h4 style="font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine); font-size: 0.95rem; margin-bottom: 8px;">Firmar libro de visitas</h4>
+                <div class="form-group" style="margin-bottom: 8px;">
+                  <input type="text" id="guestSignerName" placeholder="Tu nombre o apodo" style="width: 100%; padding: 6px 10px; border: 1px solid var(--olive-harvest); border-radius: 4px; font-size: 0.85rem; font-family: 'Outfit', sans-serif; background: #fff;">
+                </div>
+                <div class="form-group" style="margin-bottom: 8px;">
+                  <textarea id="guestSignerMessage" rows="2" placeholder="Escribe tu mensaje aquí..." style="width: 100%; padding: 6px 10px; border: 1px solid var(--olive-harvest); border-radius: 4px; font-size: 0.85rem; font-family: 'Outfit', sans-serif; background: #fff; resize: none;"></textarea>
+                </div>
+                <button type="button" id="submitGuestbookBtn" class="submit-btn" style="padding: 6px 16px; font-size: 0.82rem;">Enviar Mensaje</button>
+              </div>
+
+              <!-- Listado de mensajes principales e hilos de respuesta -->
+              <div id="guestbookMessagesList" class="guestbook-list" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- Se llena dinámicamente -->
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
   </div>
 
-  <!-- MODAL PARA EXPLORAR SITIOS DE OTROS USUARIOS -->
+  <!-- MODAL DE EXPLORAR ESPACIOS (NUEVO) -->
   <div id="exploreModal" class="modal-overlay hidden">
-    <div class="clean-modal-box" style="max-width: 650px; width: 90%;">
+    <div class="clean-modal-box" style="max-width: 650px;">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--olive-harvest); padding-bottom: 8px; margin-bottom: 14px;">
-        <h3 style="margin: 0; font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine);">✦ Explorar Espacios de la Comunidad</h3>
-        <button type="button" id="closeExploreModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--spiced-wine);">✕</button>
+        <h3 style="font-family: 'Newsreader', serif; font-style: italic; color: var(--spiced-wine);">✦ Explorar Espacios de la Comunidad</h3>
+        <button type="button" id="closeExploreModalBtn" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--spiced-wine);">✕</button>
       </div>
-      
-      <p style="font-size: 0.88rem; color: var(--olive-harvest); margin-bottom: 12px;">Descubre y visita los rincones creados por otros miembros en Loop:</p>
-      
-      <div id="communitySitesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
-        <!-- Se llena dinámicamente con la base de datos -->
+      <div id="exploreModalGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; max-height: 400px; overflow-y: auto;">
+        <!-- Se llena dinámicamente -->
       </div>
     </div>
   </div>
@@ -648,7 +681,7 @@
     <div class="footer-center-socials">
       <a href="https://www.instagram.com/loop.espacios/" target="_blank" class="social-link">Instagram</a>
       <a href="https://www.facebook.com/share/1HWprbY4ue/" target="_blank" class="social-link">Facebook</a>
-      <a href="https://github.com" target="_blank" class="social-link">GitHub</a>
+      <a href="https://x.com/loop_t3n" target="_blank" class="social-link">X(Twitter): loop (@loop_t3n)</a>
     </div>
 
     <ul class="footer-links">
