@@ -1345,11 +1345,17 @@ document.addEventListener('DOMContentLoaded', () => {
           payload.moodboard_data = newMoodboardData;
 
           if (postTitle && postContent) {
-            bitacoraEntriesList.unshift({
+            if (!Array.isArray(bitacoraEntriesList)) {
+              bitacoraEntriesList = [];
+            }
+
+            const nuevaEntrada = {
               title: postTitle,
               content: postContent,
               date: new Date().toISOString()
-            });
+            };
+
+            bitacoraEntriesList.unshift(nuevaEntrada);
             currentUser.bitacora_posts = bitacoraEntriesList;
             payload.bitacora_posts = bitacoraEntriesList;
 
@@ -1379,6 +1385,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (updateItem) {
+          if (!Array.isArray(updatesHistoryList)) {
+            updatesHistoryList = [];
+          }
           updatesHistoryList.unshift(updateItem);
           if (updatesHistoryList.length > 5) updatesHistoryList.pop();
           currentUser.updates_history = updatesHistoryList;
