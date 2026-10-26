@@ -39,7 +39,6 @@ body.theme-senga {
   --card-bg: #FFFDF9;
 }
 
-/* NUEVA PALETA: JACARANDAS & CIELO */
 body.theme-jacaranda {
   --deep-chocolate: #29384D;
   --spiced-wine: #2961B1;
@@ -63,6 +62,22 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   transition: background-color 0.3s ease;
+  position: relative;
+}
+
+/* EFECTO TEXTURA DE PUNTILLISMO (DITHERING) RETRO GLOBAL */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.12) 1px, transparent 1px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.6;
 }
 
 .hidden {
@@ -133,7 +148,7 @@ a:hover {
   color: var(--golden-batter) !important;
 }
 
-/* BARRA SUPERIOR CUANDO HAY SESIÓN (BUSCADOR DE USUARIOS) */
+/* BARRA SUPERIOR CUANDO HAY SESIÓN */
 .logged-top-bar {
   display: flex;
   align-items: center;
@@ -291,13 +306,7 @@ a:hover {
   border-radius: 12px;
 }
 
-.script-accent {
-  font-family: 'Newsreader', serif;
-  font-style: italic;
-  color: var(--spiced-wine);
-}
-
-.script-accent-dark {
+.script-accent, .script-accent-dark {
   font-family: 'Newsreader', serif;
   font-style: italic;
   color: var(--spiced-wine);
@@ -843,7 +852,8 @@ a:hover {
 
 .counter { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--olive-harvest); text-align: right; }
 
-/* RESEÑAS GRID */
+/* RESEÑAS GRID - CONTENEDORES DE POSTERS AMPLIADOS */
+/* RESEÑAS GRID - CONTENEDORES DE POSTERS Y TEXTO CORREGIDOS */
 .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
 .review-card-item { background: #fff; border: 1px solid var(--olive-harvest); border-radius: 6px; padding: 10px; position: relative; }
 
@@ -861,11 +871,37 @@ a:hover {
   font-size: 0.7rem;
 }
 
-.review-poster-box { height: 180px; overflow: hidden; border-radius: 4px; margin-bottom: 8px; }
+.review-poster-box { 
+  height: 240px; 
+  overflow: hidden; 
+  border-radius: 4px; 
+  margin-bottom: 8px;
+  background: #f0ede6;
+}
 .review-poster-box img { width: 100%; height: 100%; object-fit: cover; }
 .review-title { font-size: 0.9rem; color: var(--spiced-wine); }
-.review-sub { font-size: 0.75rem; color: var(--olive-harvest); font-style: italic; }
-.review-body-scroll { max-height: 80px; overflow-y: auto; font-size: 0.78rem; margin-top: 6px; }
+.review-sub { font-size: 0.75rem; color: var(--olive-harvest); font-style: italic; margin-bottom: 6px; }
+
+/* CONTENEDOR DE TEXTO CON ESPACIADO MEJORADO */
+.review-body-scroll { 
+  max-height: 110px; 
+  overflow-y: auto; 
+  font-size: 0.78rem; 
+  margin-top: 6px; 
+  padding-right: 4px;
+}
+
+.sinopsis-text {
+  color: #555;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--golden-batter);
+}
+
+.opinion-text {
+  color: #2b2b2b;
+  font-style: italic;
+}
 
 /* BITÁCORA POSTS */
 .palette-circle { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
